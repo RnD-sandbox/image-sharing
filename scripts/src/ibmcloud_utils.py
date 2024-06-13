@@ -85,44 +85,81 @@ def filter_trusted_profiles(trusted_profiles, relevant_accounts_dict):
     ]
 
 def deploy_image_to_child_accounts(account_list, enterprise_access_token):
+    """
+    Deploys image to child accounts using multiprocessing.
+
+    :param account_list: List of account dictionaries containing account details.
+    :param enterprise_access_token: Enterprise account access token.
+    """
     if account_list:
         args = [(account, enterprise_access_token) for account in account_list]
         with multiprocessing.Pool(processes=5) as pool:
             pool.starmap(deploy_image_to_account, args)
 
 def deploy_image_to_account(account, enterprise_access_token):
+    """
+    Deploys image to a single child account.
+
+    :param account: Dictionary containing account details.
+    :param enterprise_access_token: Enterprise account access token.
+    """
     access_token_response, _error = get_child_account_access_token(account['profile_id'], account['account_id'], enterprise_access_token)
     if access_token_response:
         bearer_token = f"Bearer {access_token_response.json()['access_token']}"
-        powervs_workspaces_response, _error = get_powervs_workspaces(bearer_token)
-        if powervs_workspaces_response:
-            power_workspaces = powervs_workspaces_response.json()['workspaces']
-            import_images_to_workspaces(power_workspaces, account, bearer_token)
-        else:
-            logging.error(f"Failed to fetch the Power Virtual Server workspaces for {account['name']}")
+        import_images_to_workspaces(account, bearer_token)
     else:
         logging.error(f"Failed to retrieve access token for account - {account['name']}")
 
-def import_images_to_workspaces(workspaces, account, bearer_token):
-    for workspace in workspaces:
-        boot_images_response, _error = get_boot_images(workspace, bearer_token)
-        if boot_images_response:
-            boot_images = boot_images_response.json()['images']
-            concerned_image = list(filter(lambda image: image.get('name', '')=='my-image-catalog-name', boot_images))
-            if concerned_image and concerned_image != None:
-                print(concerned_image[0]['name'])
-                if concerned_image[0]['state'] == 'active':
-                    print(f"The boot image is already present in the workspace {workspace['name']} under account {account['name']}") # TODO add this to a logging object 'skipped workspaces'
-            else:
-                import_boot_image(workspace, bearer_token)
+def import_images_to_workspaces(account, bearer_token):
+    """
+    Imports image to all workspaces under an account.
+
+    :param account: Dictionary containing account details.
+    :param bearer_token: Bearer token for the account.
+    """
+    powervs_workspaces_response, _error = get_powervs_workspaces(bearer_token)
+    if powervs_workspaces_response:
+            power_workspaces = powervs_workspaces_response.json()['workspaces']
+            for workspace in power_workspaces:
+                import_images_to_workspace(workspace, account, bearer_token)
+    else:
+        logging.error(f"Failed to fetch the Power Virtual Server workspaces for {account['name']}")
+
+def import_images_to_workspace(workspace, account, bearer_token):
+    """
+    Imports image to a single workspace.
+
+    :param workspace: Dictionary containing workspace details.
+    :param account: Dictionary containing account details.
+    :param bearer_token: Bearer token for the account.
+    """
+    boot_images_response, _error = get_boot_images(workspace, bearer_token)
+    if boot_images_response:
+        image_found, is_active = process_image('my-image-catalog-name', boot_images_response.json()['images']) # TODO remove hard coded value
+        if image_found and is_active:
+            print(f"The boot image to be imported already in the workspace {workspace['name']} under account {account['name']}. Aborting the operation")
+        else:
+            import_boot_image(workspace, bearer_token)
 
 def delete_image_from_child_accounts(account_list, enterprise_access_token):
+    """
+    Deletes image from child accounts using multiprocessing.
+
+    :param account_list: List of account dictionaries containing account details.
+    :param enterprise_access_token: Enterprise access token.
+    """
     if account_list:
         args = [(account, enterprise_access_token) for account in account_list]
         with multiprocessing.Pool(processes=5) as pool:
             pool.starmap(delete_image_from_account, args)
 
 def delete_image_from_account(account, enterprise_access_token):
+    """
+    Deletes image from a single child account.
+
+    :param account: Dictionary containing account details.
+    :param enterprise_access_token: Enterprise access token.
+    """
     access_token_response, _error = get_child_account_access_token(account['profile_id'], account['account_id'], enterprise_access_token)
     if access_token_response:
         bearer_token = f"Bearer {access_token_response.json()['access_token']}"
@@ -131,6 +168,12 @@ def delete_image_from_account(account, enterprise_access_token):
         logging.error(f"Failed to retrieve access token for account - {account['name']}")
 
 def delete_image_from_workpsaces(account, bearer_token):
+    """
+    Deletes image from all workspaces under an account.
+
+    :param account: Dictionary containing account details.
+    :param bearer_token: Bearer token for the account.
+    """
     powervs_workspaces_response, _error = get_powervs_workspaces(bearer_token)
     if powervs_workspaces_response:
         power_workspaces = powervs_workspaces_response.json()['workspaces']
@@ -140,6 +183,13 @@ def delete_image_from_workpsaces(account, bearer_token):
         logging.error(f"Failed to fetch the Power Virtual Server workspaces for {account['name']}")
         
 def delete_image_from_workpsace(workspace, account, bearer_token):
+    """
+    Deletes image from a single workspace.
+
+    :param workspace: Dictionary containing workspace details.
+    :param account: Dictionary containing account details.
+    :param bearer_token: Bearer token for the account.
+    """
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
     if boot_images_response:
         image_found, is_active = process_image('my-image-catalog-name', boot_images_response.json()['images']) # TODO remove hard coded value
@@ -164,12 +214,6 @@ def process_image(boot_image_name, boot_images):
         else:
             return concerned_image[0], False
     else:
-        return None, False    
-    
-
-
-#        import_boot_image(workspace, account, bearer_token)
-#    with multiprocessing.Pool(processes=5) as pool:
-#        pool.starmap(import_boot_image, [(workspace, account, bearer_token) for workspace in workspaces])
+        return None, False
 
 
