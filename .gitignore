@@ -1,0 +1,16 @@
+.env
+/dev
+scripts/dev/
+steps.txt
+
+**/.terraform/*
+**/__pycache__/*
+
+
+input.auto.tfvars
+*.tfstate
+*.tfstate.*
+*.terraform.lock.hcl
+sample.json
+test.json
+*steps.txt

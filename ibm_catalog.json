@@ -1,0 +1,63 @@
+{
+    "products": [
+        {
+            "name": "powervs-boot-image-sharing",
+            "label": "PowerVS Boot Image Sharing",
+            "product_kind": "solution",
+            "tags": [
+                "network_vpc",
+                "ibm_created",
+                "free",
+                "Technology",
+                "SoftwareAndPlatformApplications",
+                "target_terraform",
+                "terraform",
+                "reference_architecture",
+                "solution",
+                "support_ibm"
+            ],
+            "keywords": [
+                "power",
+                "sap",
+                "sap hana",
+                "sap netweaver",
+                "power solution",
+                "power infrastructure",
+                "powervs",
+                "power vs",
+                "power framework",
+                "sap power",
+                "automation",
+                "secure",
+                "networking",
+                "vertical scaling",
+                "scalable server",
+                "quickstart",
+                "quick"
+            ],
+            "short_description": "",
+            "long_description": "",
+            "offering_docs_url": "https://cloud.ibm.com/docs/powervs-vpc?topic=powervs-vpc-automation-solution-overview",
+            "offering_icon_url": "",
+            "flavors": [
+                {
+                    "label": "Standard",
+                    "name": "standard",
+                    "install_type": "fullstack",
+                    "index": 1,
+                    "working_directory": "solutions/import-images",
+                    "configuration": [                        
+                        {
+                            "key": "ibmcloud_api_key",
+                            "required": true
+                        },
+                        {
+                            "key": "cos_credentials",
+                            "required": true
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
