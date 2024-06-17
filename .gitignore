@@ -1,5 +1,8 @@
 .env
+*.DS_Store*
+/.vscode
 /dev
+/trials
 scripts/dev/
 steps.txt
 

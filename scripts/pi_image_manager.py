@@ -1,6 +1,7 @@
 import logging
 import argparse
 from src.ibmcloud_utils import *
+import time
 
 def parse_arguments():
     """
@@ -62,11 +63,17 @@ def main():
     if args.operation == 'IMPORT':
         logging.info(f"Initiating provided PowerVS boot image {args.operation} operation.")
         deploy_image_to_child_accounts(filtered_trusted_profiles, access_token)
+        time.sleep(1800)
+        get_image_import_status_from_accounts(filtered_trusted_profiles, access_token)
     elif args.operation == 'DELETE':
         logging.info(f"Initiating provided PowerVS boot image {args.operation} operation.")
         delete_image_from_child_accounts(filtered_trusted_profiles, access_token)
+    elif args.operation == 'STATUS':
+        logging.info(f"Initiating provided PowerVS boot image {args.operation} operation.")
+        get_image_import_status_from_accounts(filtered_trusted_profiles, access_token)
     else:
         logging.error(f"Unindentified action '{args.operation}' passed. Supported operations are IMPORT and DELETE.")
+        
     #for profile in filtered_trusted_profiles:
     #    print(profile)
 

@@ -9,7 +9,7 @@ resource "terraform_data" "example2" {
     environment = {
       ACCESS_KEY = var.cos_data.access_key
       SECRET_KEY = var.cos_data.secret_key
-      API_KEY = var.ibmcloud_api_key
+      API_KEY    = var.ibmcloud_api_key
     }
   }
 }
