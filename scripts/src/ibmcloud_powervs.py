@@ -13,7 +13,6 @@ def get_powervs_workspaces(bearer_token):
     return response, _err
 
 def get_boot_images(workspace, bearer_token):
-    #print(f"Workspace - {workspace['name']}, Account - {account['name']}")
     workspace_id = workspace['id']
     base_url = workspace['location']['url']
     request_url = f"{base_url}/pcloud/v1/cloud-instances/{workspace_id}/images"
@@ -26,7 +25,6 @@ def get_boot_images(workspace, bearer_token):
     return response, _err
 
 def import_boot_image(workspace, bearer_token):
-    #print(f"Workspace - {workspace['name']}, Account - {account['name']}")
     workspace_id = workspace['id']
     base_url = workspace['location']['url']
     request_url = f"{base_url}/pcloud/v1/cloud-instances/{workspace_id}/cos-images"
@@ -36,13 +34,13 @@ def import_boot_image(workspace, bearer_token):
         "CRN": workspace['details']['crn']
     }
     request_data = {
-        "imageName": "my-image-catalog-name",         # TODO - change to var
-        "region": "eu-de",                            # TODO - change to var
-        "imageFilename": "rh-9-2-sap-2703.ova.gz",    # TODO - change to var
-        "bucketName": "sap-hyperscalar",              # TODO - change to var
-        "accessKey": os.getenv('ACCESS_KEY'),
-        "secretKey": os.getenv('SECRET_KEY'),
-        "storageType": "tier0"
+        "imageName"     : os.getenv('POWERVS_IMAGE_NAME'),
+        "region"        : os.getenv('COS_REGION'),
+        "imageFilename" : os.getenv('COS_IMAGE_FILE_NAME'),
+        "bucketName"    : os.getenv('COS_BUCKET_NAME'),
+        "accessKey"     : os.getenv('COS_ACCESS_KEY'),
+        "secretKey"     : os.getenv('COS_SECRET_KEY'),
+        "storageType"   : os.getenv('COS_STORAGE_TYPE')
     }
     response, _err = post_request(request_url, request_headers, json.dumps(request_data))
     return response, _err

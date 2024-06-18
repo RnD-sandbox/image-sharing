@@ -8,6 +8,8 @@ steps.txt
 
 **/.terraform/*
 **/__pycache__/*
+*.log*
+*_log.json
 
 
 input.auto.tfvars

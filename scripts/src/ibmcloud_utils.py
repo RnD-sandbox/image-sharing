@@ -1,5 +1,6 @@
 import logging
 import multiprocessing
+import json
 from src.ibmcloud_iam import *
 from src.ibmcloud_powervs import *
 from src.custom_logger import ImageShareLogger, ImageStatusLogger, merge_status_logs, log_account_level_status, merge_image_op_logs, log_account_level_image_op
@@ -97,8 +98,9 @@ def deploy_image_to_child_accounts(account_list, enterprise_access_token):
         with multiprocessing.Pool(processes=5) as pool:
             results = pool.starmap(deploy_image_to_account, args)
             final_log = merge_image_op_logs(results)
+            write_logs_to_file(final_log, 'pi_image_manager_log.json')
             #print(final_log.get_log())
-            print(json.dumps(final_log, indent=2))
+            #print(json.dumps(final_log, indent=2))
 
 def deploy_image_to_account(account, enterprise_access_token):
     """
@@ -167,7 +169,8 @@ def delete_image_from_child_accounts(account_list, enterprise_access_token):
         with multiprocessing.Pool(processes=5) as pool:
             results = pool.starmap(delete_image_from_account, args)
             final_log = merge_image_op_logs(results)
-            print(json.dumps(final_log, indent=2))
+            write_logs_to_file(final_log, 'pi_image_manager_log.json')
+            #print(json.dumps(final_log, indent=2))
 
 def delete_image_from_account(account, enterprise_access_token):
     """
@@ -228,7 +231,8 @@ def get_image_import_status_from_accounts(account_list, enterprise_access_token)
         with multiprocessing.Pool(processes=5) as pool:
             results = pool.starmap(status_check_from_account, args)
             final_log = merge_status_logs(results)
-            print(json.dumps(final_log, indent=2))
+            write_logs_to_file(final_log, 'pi_image_status_log.json')
+            #print(json.dumps(final_log, indent=2))
             
 def status_check_from_account(account, enterprise_access_token):
     """
@@ -277,7 +281,7 @@ def status_check_from_workpsace(workspace, account, bearer_token, logger):
     """
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
     if boot_images_response:
-        image_found, is_active = process_image('my-image-catalog-name', boot_images_response.json()['images']) # TODO remove hard coded value
+        image_found, is_active = process_image(os.getenv('POWERVS_IMAGE_NAME'), boot_images_response.json()['images'])
         if image_found and is_active:
             logger.active.append({
                 "id": workspace['id'],
@@ -307,4 +311,6 @@ def process_image(boot_image_name, boot_images):
     else:
         return None, False
 
-
+def write_logs_to_file(logger, file_name):
+    with open(file_name, 'w', encoding='utf-8') as f:
+        json.dump(logger, f, ensure_ascii=False, indent=4)
