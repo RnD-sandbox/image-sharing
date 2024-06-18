@@ -1,6 +1,7 @@
 variable "ibmcloud_api_key" {
   description = "Name of IBM Cloud PowerVS workspace which will be created."
   type        = string
+  sensitive   = true
 }
 
 variable "enterprise_id" {
@@ -28,13 +29,14 @@ variable "cos_data" {
     secret_key      = string
     storage_type    = string
   })
-  default = null
+  default   = null
+  sensitive = true
 }
 
 variable "image_operation" {
   type = string
   validation {
-    condition     = var.image_operation == "IMPORT" || var.image_operation == "DELETE"
+    condition     = var.image_operation == "IMPORT" || var.image_operation == "DELETE" || var.image_operation == "STATUS"
     error_message = "Supported values are IMPORT and DELETE"
   }
 }
