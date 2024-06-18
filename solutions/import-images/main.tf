@@ -23,13 +23,19 @@ resource "terraform_data" "pi_image_manager_exec" {
   }
 }
 
-locals {
-  pi_image_operation_results = jsondecode(file(local.pi_image_operation_log))
-  pi_image_status_results    = jsondecode(file(local.pi_image_status_log))
+data "local_file" "pi_image_operation_log_file" {
+  filename   = local.pi_image_operation_log
+  depends_on = [resource.terraform_data.pi_image_manager_exec]
 }
 
-data "local_file" "python_code_exec_log" {
-  filename = "app.log"
+data "local_file" "pi_image_status_log_file" {
+  filename   = local.pi_image_status_log
+  depends_on = [resource.terraform_data.pi_image_manager_exec]
+}
+
+locals {
+  pi_image_operation_results = jsondecode(data.local_file.pi_image_operation_log_file.content)
+  pi_image_status_results    = jsondecode(data.local_file.pi_image_status_log_file.content)
 }
 
 

@@ -1,63 +1,95 @@
 {
-    "products": [
+  "products": [
+    {
+      "name": "powervs-boot-image-sharing",
+      "label": "PowerVS Boot Image Sharing",
+      "product_kind": "solution",
+      "tags": [
+        "network_vpc",
+        "ibm_created",
+        "free",
+        "Technology",
+        "SoftwareAndPlatformApplications",
+        "target_terraform",
+        "terraform",
+        "reference_architecture",
+        "solution",
+        "support_ibm"
+      ],
+      "keywords": [
+        "power",
+        "sap",
+        "sap hana",
+        "sap netweaver",
+        "power solution",
+        "power infrastructure",
+        "powervs",
+        "power vs",
+        "power framework",
+        "sap power",
+        "automation",
+        "secure",
+        "networking",
+        "vertical scaling",
+        "scalable server",
+        "quickstart",
+        "quick"
+      ],
+      "short_description": "Distribute custom boot images for business usecases to Power Virtual Server(PowerVS) Workspaces on IBM Cloud® enterprise child accounts.",
+      "long_description": "",
+      "offering_docs_url": "https://cloud.ibm.com/docs/powervs-vpc?topic=powervs-vpc-automation-solution-overview",
+      "offering_icon_url": "",
+      "flavors": [
         {
-            "name": "powervs-boot-image-sharing",
-            "label": "PowerVS Boot Image Sharing",
-            "product_kind": "solution",
-            "tags": [
-                "network_vpc",
-                "ibm_created",
-                "free",
-                "Technology",
-                "SoftwareAndPlatformApplications",
-                "target_terraform",
-                "terraform",
-                "reference_architecture",
-                "solution",
-                "support_ibm"
-            ],
-            "keywords": [
-                "power",
-                "sap",
-                "sap hana",
-                "sap netweaver",
-                "power solution",
-                "power infrastructure",
-                "powervs",
-                "power vs",
-                "power framework",
-                "sap power",
-                "automation",
-                "secure",
-                "networking",
-                "vertical scaling",
-                "scalable server",
-                "quickstart",
-                "quick"
-            ],
-            "short_description": "",
-            "long_description": "",
-            "offering_docs_url": "https://cloud.ibm.com/docs/powervs-vpc?topic=powervs-vpc-automation-solution-overview",
-            "offering_icon_url": "",
-            "flavors": [
+          "label": "Standard",
+          "name": "standard",
+          "install_type": "fullstack",
+          "index": 1,
+          "working_directory": "solutions/import-images",
+          "configuration": [
+            {
+              "key": "ibmcloud_api_key",
+              "required": true
+            },
+            {
+              "key": "enterprise_id",
+              "required": true
+            },
+            {
+              "key": "account_group_name",
+              "required": true
+            },
+            {
+              "key": "cos_image_file_name",
+              "required": true
+            },
+            {
+              "key": "cos_data",
+              "required": true
+            },
+            {
+              "key": "image_operation",
+              "type": "string",
+              "required": true,
+              "default_value": "",
+              "options": [
                 {
-                    "label": "Standard",
-                    "name": "standard",
-                    "install_type": "fullstack",
-                    "index": 1,
-                    "working_directory": "solutions/import-images",
-                    "configuration": [                        
-                        {
-                            "key": "ibmcloud_api_key",
-                            "required": true
-                        },
-                        {
-                            "key": "cos_credentials",
-                            "required": true
-                        }
-                    ]
+                  "displayname": "import image",
+                  "value": "IMPORT"
+                },
+                {
+                  "displayname": "delete image",
+                  "value": "DELETE"
                 }
-            ]
+              ]
+            },
+            {
+              "key": "image_name",
+              "required": true
+            }
+          ]
         }
-    ]
+      ]
+    }
+  ]
 }
