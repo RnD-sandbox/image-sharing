@@ -34,7 +34,8 @@ variable "cos_data" {
 }
 
 variable "image_operation" {
-  type = string
+  description = "Select the import or delete operation to be performed for the PowerVS boot image."
+  type        = string
   validation {
     condition     = var.image_operation == "IMPORT" || var.image_operation == "DELETE" || var.image_operation == "STATUS"
     error_message = "Supported values are IMPORT and DELETE"
