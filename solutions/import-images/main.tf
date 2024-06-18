@@ -1,5 +1,7 @@
 locals {
   pi_image_manager_script = "../../scripts/pi_image_manager.py"
+  pi_image_operation_log  = "pi_image_manager_log.json"
+  pi_image_status_log     = "pi_image_status_log.json"
 }
 
 resource "terraform_data" "pi_image_manager_exec" {
@@ -20,5 +22,17 @@ resource "terraform_data" "pi_image_manager_exec" {
     }
   }
 }
+
+locals {
+  pi_image_operation_results = jsondecode(file(local.pi_image_operation_log))
+  pi_image_status_results    = jsondecode(file(local.pi_image_status_log))
+}
+
+data "local_file" "python_code_exec_log" {
+  filename = "app.log"
+}
+
+
+
 
 

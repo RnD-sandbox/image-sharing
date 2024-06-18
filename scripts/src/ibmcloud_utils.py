@@ -1,9 +1,12 @@
-import logging
+#import logging
 import multiprocessing
 import json
 from src.ibmcloud_iam import *
 from src.ibmcloud_powervs import *
+from src.log_utils import *
 from src.custom_logger import ImageShareLogger, ImageStatusLogger, merge_status_logs, log_account_level_status, merge_image_op_logs, log_account_level_image_op
+
+pi_logger = logging.getLogger('my_logger')
 
 def get_enterprise_bearer_token(api_key):
     """
@@ -13,12 +16,12 @@ def get_enterprise_bearer_token(api_key):
     Returns:
         access_token: Bearer token if authentication is successful, otherwise None.
     """
-    logging.info("Enterprise account authentication:")
+    pi_logger.info("Enterprise account authentication:")
     response, error = generate_bearer_token(api_key)
     if response:
         return response.json()['access_token']
     else:
-        logging.error(f"Error while authenticating using IBM Cloud enterprise account API key: {error}")
+        pi_logger.error(f"Error while authenticating using IBM Cloud enterprise account API key: {error}")
         return None
 
 def get_relevant_account_group_id(account_groups, target_name):
@@ -33,7 +36,7 @@ def get_relevant_account_group_id(account_groups, target_name):
     for account_group in account_groups:
         if account_group['name'] == target_name:
             return account_group['id']
-    logging.error(f"No account group found with the name: {target_name}")
+    pi_logger.error(f"No account group found with the name: {target_name}")
     return None
 
 def fetch_relevant_accounts(enterprise_id, account_group_id, access_token):
@@ -50,7 +53,7 @@ def fetch_relevant_accounts(enterprise_id, account_group_id, access_token):
     if response:
         return response.json()['resources']
     else:
-        logging.error(f"Failed to get the accounts under the account group id {account_group_id}: {error}")
+        pi_logger.error(f"Failed to get the accounts under the account group id {account_group_id}: {error}")
         return None
 
 def fetch_trusted_profiles(access_token):
@@ -65,7 +68,7 @@ def fetch_trusted_profiles(access_token):
     if response:
         return response.json()['profiles']
     else:
-        logging.error(f"Failed to get trusted profiles: {error}")
+        pi_logger.error(f"Failed to get trusted profiles: {error}")
         return None
 
 def filter_trusted_profiles(trusted_profiles, relevant_accounts_dict):
@@ -133,7 +136,7 @@ def import_images_to_workspaces(account, bearer_token):
                 import_images_to_workspace(workspace, account, bearer_token, logger)
     else:
         logger.log_other(account, workspace, f"Failed to fetch the Power Virtual Server workspaces for {account['name']}. {_error}")
-        #logging.error(f"Failed to fetch the Power Virtual Server workspaces for {account['name']}")
+        #pi_logger.error(f"Failed to fetch the Power Virtual Server workspaces for {account['name']}")
     return logger
 
 def import_images_to_workspace(workspace, account, bearer_token, logger):
@@ -248,7 +251,7 @@ def status_check_from_account(account, enterprise_access_token):
         workspace_logger = status_check_from_workpsaces(account, bearer_token)
         return log_account_level_status(account_logger, workspace_logger, account)
     else:
-        logging.error(f"Failed to retrieve access token for account - {account['name']}")
+        pi_logger.error(f"Failed to retrieve access token for account - {account['name']}")
         
 def status_check_from_workpsaces(account, bearer_token):
     """
@@ -292,7 +295,6 @@ def status_check_from_workpsace(workspace, account, bearer_token, logger):
                 "id": workspace['id'],
                 "name":  workspace['name']
             }) 
-            # TODO add this to a logging object 'skipped workspaces'
 
 def process_image(boot_image_name, boot_images):
     """

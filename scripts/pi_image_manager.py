@@ -1,7 +1,9 @@
-import logging
 import argparse
 from src.ibmcloud_utils import *
+from src.log_utils import *
 import time
+
+pi_logger = logging.getLogger('my_logger')
 
 def parse_arguments():
     """
@@ -19,7 +21,7 @@ def parse_arguments():
     return parser.parse_args()
 
 def fetch_status(sleep_duration, filtered_trusted_profiles, access_token):
-    logging.info(f"Initiating sleep for {sleep_duration} seconds before status check.")
+    pi_logger.info(f"Initiating sleep for {sleep_duration} seconds before status check.")
     time.sleep(sleep_duration)
     get_image_import_status_from_accounts(filtered_trusted_profiles, access_token)
     
@@ -39,7 +41,7 @@ def main():
     enterprise_id = os.getenv('IBMCLOUD_ENTERPRISE_ACCOUNT_ID')
     account_group_list_response, error = get_account_group_list(enterprise_id, access_token)
     if not account_group_list_response:
-        logging.error(f"Failed to get the enterprise account group list: {error}")
+        pi_logger.error(f"Failed to get the enterprise account group list: {error}")
         return
 
     account_group_list = account_group_list_response.json()['resources']
@@ -55,6 +57,7 @@ def main():
     # Fetch the list of relevant accounts
     relevant_accounts = fetch_relevant_accounts(args.enterprise_id, account_group_id, access_token)
     if not relevant_accounts:
+        pi_logger.error(f"The child account list for the provided account group is empty.")
         return
 
     # Create a dictionary of relevant accounts for quick lookup
@@ -63,24 +66,25 @@ def main():
     # Fetch the list of trusted profiles
     trusted_profiles = fetch_trusted_profiles(access_token)
     if not trusted_profiles:
+        pi_logger.error(f"The trusted profiles list returned is empty.")
         return
 
     # Filter the trusted profiles to include account ID, profile ID, and account name
     filtered_trusted_profiles = filter_trusted_profiles(trusted_profiles, relevant_accounts_dict)
     image_operation = os.getenv('POWERVS_IMAGE_OPERATION')
     if image_operation == 'IMPORT':
-        logging.info(f"Initiating provided PowerVS boot image {image_operation} operation.")
+        pi_logger.info(f"Initiating provided PowerVS boot image {image_operation} operation.")
         deploy_image_to_child_accounts(filtered_trusted_profiles, access_token)
         fetch_status(1800, filtered_trusted_profiles, access_token)
     elif image_operation == 'DELETE':
-        logging.info(f"Initiating provided PowerVS boot image {image_operation} operation.")
+        pi_logger.info(f"Initiating provided PowerVS boot image {image_operation} operation.")
         delete_image_from_child_accounts(filtered_trusted_profiles, access_token)
         fetch_status(300, filtered_trusted_profiles, access_token)
     elif image_operation == 'STATUS':
-        logging.info(f"Initiating provided PowerVS boot image {image_operation} operation.")
+        pi_logger.info(f"Initiating provided PowerVS boot image {image_operation} operation.")
         get_image_import_status_from_accounts(filtered_trusted_profiles, access_token)
     else:
-        logging.error(f"Unindentified action '{image_operation}' passed. Supported operations are IMPORT and DELETE.")
+        pi_logger.error(f"Unindentified action '{image_operation}' passed. Supported operations are IMPORT and DELETE.")
 
 if __name__ == "__main__":
     main()
