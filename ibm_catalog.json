@@ -1,8 +1,8 @@
 {
   "products": [
     {
-      "name": "powervs-boot-image-sharing",
-      "label": "PowerVS Boot Image Sharing",
+      "name": "powervs-custom-image-sharing",
+      "label": "PowerVS Custom Image Share",
       "product_kind": "solution",
       "tags": [
         "network_vpc",
@@ -12,40 +12,19 @@
         "SoftwareAndPlatformApplications",
         "target_terraform",
         "terraform",
-        "reference_architecture",
-        "solution",
-        "support_ibm"
+        "solution"
       ],
-      "keywords": [
-        "power",
-        "sap",
-        "sap hana",
-        "sap netweaver",
-        "power solution",
-        "power infrastructure",
-        "powervs",
-        "power vs",
-        "power framework",
-        "sap power",
-        "automation",
-        "secure",
-        "networking",
-        "vertical scaling",
-        "scalable server",
-        "quickstart",
-        "quick"
-      ],
-      "short_description": "Distribute custom boot images for business usecases to Power Virtual Server(PowerVS) Workspaces on IBM Cloud® enterprise child accounts.",
+      "keywords": [],
+      "short_description": "From IBM Cloud® Enterprise account, distribute PowerVS custom boot images from IBM Cloud object Storage (COS) to every Power Virtual Server(PowerVS) Workspaces in each of the IBM Cloud® child accounts.",
       "long_description": "",
-      "offering_docs_url": "https://cloud.ibm.com/docs/powervs-vpc?topic=powervs-vpc-automation-solution-overview",
+      "offering_docs_url": "",
       "offering_icon_url": "",
       "flavors": [
         {
           "label": "Standard",
-          "name": "standard",
+          "name": "Standard",
           "install_type": "fullstack",
           "index": 1,
-          "working_directory": "solutions/import-images",
           "configuration": [
             {
               "key": "ibmcloud_api_key",
@@ -74,11 +53,11 @@
               "default_value": "",
               "options": [
                 {
-                  "displayname": "import image",
+                  "displayname": "Import image",
                   "value": "IMPORT"
                 },
                 {
-                  "displayname": "delete image",
+                  "displayname": "Delete image",
                   "value": "DELETE"
                 }
               ]
