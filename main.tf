@@ -32,8 +32,9 @@ resource "terraform_data" "pi_image_manager_exec" {
     # IBMCLOUD_API_KEY, IBMCLOUD_ENTERPRISE_ACCOUNT_ID, IBMCLOUD_ACCOUNT_GROUP_NAME, COS_IMAGE_FILE_NAME, COS_REGION, COS_BUCKET_NAME, COS_ACCESS_KEY, COS_SECRET_KEY, COS_STORAGE_TYPE, POWERVS_IMAGE_OPERATION, POWERVS_IMAGE_NAME, LOG_OPERATION_FILE_NAME, LOG_IMAGE_STATUS_FILE_NAME
 
     command = <<-EOT
-      python3 --version
       pip3 install requests
+      pip3 install hmac
+      pip3 install hashlib
       python3 ./scripts/pi_image_manager.py
     EOT
 
