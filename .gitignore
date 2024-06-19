@@ -1,5 +1,5 @@
 .env
-*.DS_Store*
+.DS_Store*
 /.vscode
 /dev
 /trials
@@ -11,7 +11,6 @@ steps.txt
 *.log*
 *_log.json
 
-
 input.auto.tfvars
 *.tfstate
 *.tfstate.*
@@ -19,3 +18,4 @@ input.auto.tfvars
 sample.json
 test.json
 *steps.txt
+.DS_Store
