@@ -33,7 +33,6 @@ resource "terraform_data" "pi_image_manager_exec" {
 
     command = <<-EOT
       pip3 install requests
-      pip3 install hmac
       pip3 install boto3
       python3 ./scripts/pi_image_manager.py
     EOT

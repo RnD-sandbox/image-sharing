@@ -8,7 +8,7 @@ import sys
 pi_logger = logging.getLogger("my_logger")
 
 
-def object_exists_in_ibm_cos(access_key, secret_key, region, bucket, object_key):
+def object_exists_in_ibm_cos2(access_key, secret_key, region, bucket, object_key):
     # hashing and signing methods
     def hash(key, msg):
         return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()

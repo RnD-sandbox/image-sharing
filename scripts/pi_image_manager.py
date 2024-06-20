@@ -1,6 +1,6 @@
 import time
 
-from src.ibmcloud_cos import *
+from src.ibmcloud_cos2 import *
 from src.ibmcloud_utils import *
 from src.log_utils import *
 
@@ -67,6 +67,8 @@ def main():
         # Check if cos credentials and image exists in bucket
         object_exists_in_ibm_cos(access_key, secret_key, region, bucket, object_key)
 
+
+"""
         deploy_image_to_child_accounts(
             filtered_trusted_profiles, access_token, log_operation_file_name
         )
@@ -86,7 +88,7 @@ def main():
         pi_logger.error(
             f"Unidentified action '{image_operation}' passed. Supported operations are IMPORT and DELETE."
         )
-
+"""
 
 if __name__ == "__main__":
     main()
