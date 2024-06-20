@@ -28,7 +28,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_account_group_name"></a> [account\_group\_name](#input\_account\_group\_name) | Name of the parent account group. | `string` | n/a | yes |
 | <a name="input_cos_data"></a> [cos\_data](#input\_cos\_data) | The COS credentials to download the image file. | <pre>object({<br>    cos_region      = string<br>    cos_bucket_name = string<br>    access_key      = string<br>    secret_key      = string<br>    storage_type    = string<br>  })</pre> | `null` | no |
-| <a name="input_cos_image_file_name"></a> [cos\_image\_file\_name](#input\_cos\_image\_file\_name) | The name of the image file to be downloaded from COS bucket. | `string` | `""` | no |
+| <a name="input_cos_image_file_name"></a> [cos\_image\_file\_name](#input\_cos\_image\_file\_name) | The name of the image file to be downloaded from COS bucket. | `string` | `null` | no |
 | <a name="input_enterprise_id"></a> [enterprise\_id](#input\_enterprise\_id) | The ID of the enterprise account | `string` | n/a | yes |
 | <a name="input_ibmcloud_api_key"></a> [ibmcloud\_api\_key](#input\_ibmcloud\_api\_key) | IBM Cloud enterprise API key created within Service ID | `string` | n/a | yes |
 | <a name="input_image_name"></a> [image\_name](#input\_image\_name) | The name under which the boot image is visible on PowerVS workspace. | `string` | n/a | yes |
