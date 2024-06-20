@@ -9,11 +9,11 @@ resource "terraform_data" "trigger_vars" {
     IBMCLOUD_ENTERPRISE_ACCOUNT_ID = var.enterprise_id
     IBMCLOUD_ACCOUNT_GROUP_NAME    = var.account_group_name
     COS_IMAGE_FILE_NAME            = var.cos_image_file_name
-    COS_REGION                     = var.cos_data.cos_region
-    COS_BUCKET_NAME                = var.cos_data.cos_bucket_name
-    COS_ACCESS_KEY                 = var.cos_data.access_key
-    COS_SECRET_KEY                 = var.cos_data.secret_key
-    COS_STORAGE_TYPE               = var.cos_data.storage_type
+    COS_REGION                     = var.cos_data != null ? var.cos_data.cos_region : ""
+    COS_BUCKET_NAME                = var.cos_data != null ? var.cos_data.cos_bucket_name : ""
+    COS_ACCESS_KEY                 = var.cos_data != null ? var.cos_data.access_key : ""
+    COS_SECRET_KEY                 = var.cos_data != null ? var.cos_data.secret_key : ""
+    COS_STORAGE_TYPE               = var.cos_data != null ? var.cos_data.storage_type : ""
     POWERVS_IMAGE_OPERATION        = var.image_operation
     POWERVS_IMAGE_NAME             = var.image_name
     LOG_OPERATION_FILE_NAME        = local.log_operation_file_name
