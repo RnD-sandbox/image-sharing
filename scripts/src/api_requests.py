@@ -2,7 +2,7 @@ import requests
 from src.log_utils import *
 from requests.exceptions import HTTPError
 
-pi_logger = logging.getLogger('my_logger')
+pi_logger = logging.getLogger('logger')
 
 def get_request(url, headers=None, params=None):
     try:

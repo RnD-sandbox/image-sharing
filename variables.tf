@@ -1,5 +1,5 @@
 variable "ibmcloud_api_key" {
-  description = "Name of IBM Cloud PowerVS workspace which will be created."
+  description = "IBM Cloud enterprise API key created within Service ID."
   type        = string
   sensitive   = true
 }
@@ -10,14 +10,14 @@ variable "enterprise_id" {
 }
 
 variable "account_group_name" {
-  description = "The account group with all target child accounts under the enterprise account."
+  description = "Name of the parent account group."
   type        = string
 }
 
 variable "cos_image_file_name" {
   description = "The name of the image file to be downloaded from COS bucket."
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "cos_data" {
