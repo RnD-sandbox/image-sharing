@@ -15,6 +15,7 @@ from src.custom_logger import (
 from src.ibmcloud_iam import *
 from src.ibmcloud_powervs import *
 from src.log_utils import *
+from src.constants import CONFIG
 
 pi_logger = logging.getLogger("logger")
 
@@ -161,7 +162,7 @@ def import_image_to_workspace(workspace, bearer_token, logger):
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
     if boot_images_response:
         image_found, is_active = process_image(
-            os.getenv("POWERVS_IMAGE_NAME"), boot_images_response.json()["images"]
+            CONFIG.get("cos_bucket_details")["cos_image_file_name"], boot_images_response.json()["images"]
         )
         if image_found and is_active:
             logger.log_skipped(workspace)
@@ -188,7 +189,6 @@ def delete_image_from_child_accounts(
             results = pool.starmap(delete_image_from_account, args)
             final_log = merge_image_op_logs(results)
             write_logs_to_file(final_log, log_operation_file_name)
-            # print(json.dumps(final_log, indent=2))
 
 
 def delete_image_from_account(account, enterprise_access_token):
@@ -247,7 +247,7 @@ def delete_image_from_workspace(workspace, account, bearer_token, logger):
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
     if boot_images_response:
         image_found, is_active = process_image(
-            os.getenv("POWERVS_IMAGE_NAME"), boot_images_response.json()["images"]
+            CONFIG.get("image_name"), boot_images_response.json()["images"]
         )
         if image_found and is_active:
             response, _error = delete_boot_image(
@@ -319,7 +319,7 @@ def status_check_from_workspace(workspace, bearer_token, logger):
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
     if boot_images_response:
         image_found, is_active = process_image(
-            os.getenv("POWERVS_IMAGE_NAME"), boot_images_response.json()["images"]
+            CONFIG.get("image_name"), boot_images_response.json()["images"]
         )
         if image_found and is_active:
             logger.active.append({"id": workspace["id"], "name": workspace["name"]})

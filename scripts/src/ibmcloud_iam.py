@@ -26,14 +26,15 @@ def get_trusted_profiles(access_token):
     req_headers = {"Content-Type": "application/x-www-form-urlencoded"}
     req_params = {"access_token": access_token}
     pi_logger.info(
-        f"Start: Fetching trusted profiles for all child accounts under account group {os.getenv('IBMCLOUD_ACCOUNT_GROUP_NAME')} ..."
+        f"Start: Fetching the trusted profiles ..."
     )
     response, error = get_request(req_url, req_headers, req_params)
 
     if response:
         pi_logger.info(
-            f"End: Fetched trusted profiles for all child accounts under account group {os.getenv('IBMCLOUD_ACCOUNT_GROUP_NAME')} ..."
+            f"End: Fetched all trusted profiles."
         )
+        print(response.json())
         return response.json()["profiles"]
     else:
         pi_logger.error(f"Error Failed to get trusted profiles: {error}")
@@ -48,18 +49,18 @@ def get_account_group_list(enterprise_id, iam_token):
     }
     req_params = {"enterprise_id": enterprise_id, "include_deleted": "false"}
     pi_logger.info(
-        f"Start: Fetching account groups in Enterprise account with ID {os.getenv('IBMCLOUD_ENTERPRISE_ACCOUNT_ID')} ..."
+        f"Start: Fetching account groups in Enterprise account with ID {enterprise_id} ..."
     )
     response, error = get_request(req_url, req_headers, req_params)
 
     if response:
         pi_logger.info(
-            f"END: Fetched account groups in Enterprise account with ID {os.getenv('IBMCLOUD_ENTERPRISE_ACCOUNT_ID')}"
+            f"END: Fetched account groups in Enterprise account with ID {enterprise_id}"
         )
         return response.json()["resources"]
     else:
         pi_logger.error(
-            f"Error fetching the account groups for account ID {os.getenv('IBMCLOUD_ENTERPRISE_ACCOUNT_ID')}. Invalid Enterprise account ID for the API key provided: {error}"
+            f"Error fetching the account groups for account ID {enterprise_id}. Invalid Enterprise account ID for the API key provided: {error}"
         )
         sys.exit(1)
 
@@ -77,17 +78,17 @@ def get_account_list(enterprise_id, account_group_id, iam_token):
     }
 
     pi_logger.info(
-        f"Start: Fetching list of accounts under the account group {os.getenv('IBMCLOUD_ACCOUNT_GROUP_NAME')} with account group id {account_group_id} ..."
+        f"Start: Fetching list of accounts under the account group id {account_group_id} ..."
     )
     response, error = get_request(req_url, req_headers, req_params)
     if response:
         pi_logger.info(
-            f"END: Fetched list of accounts under the account group {os.getenv('IBMCLOUD_ACCOUNT_GROUP_NAME')} with account group id {account_group_id} ..."
+            f"END: Fetched list of accounts under the account group id {account_group_id} ..."
         )
         return response.json()["resources"]
     else:
         pi_logger.error(
-            f"Error fetching list of accounts under the account group {os.getenv('IBMCLOUD_ACCOUNT_GROUP_NAME')} with account group id {account_group_id}: {error}"
+            f"Error fetching list of accounts under the account group id {account_group_id}: {error}"
         )
         sys.exit(1)
 
