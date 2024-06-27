@@ -39,7 +39,7 @@ def import_boot_image(workspace, bearer_token):
         "CRN": workspace["details"]["crn"],
     }
     request_data = {
-        "imageName": CONFIG.get("image_name"),
+        "imageName": CONFIG.get("image_import_details")["image_name"],
         "region": CONFIG.get("cos_bucket_details")["cos_region"],
         "imageFilename": CONFIG.get("cos_bucket_details")["cos_image_file_name"],
         "bucketName": CONFIG.get("cos_bucket_details")["cos_bucket"],

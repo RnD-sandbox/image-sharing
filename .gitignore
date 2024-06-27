@@ -3,6 +3,7 @@
 /.vscode
 /dev
 /trials
+/test
 scripts/dev/
 steps.txt
 *.tfvars

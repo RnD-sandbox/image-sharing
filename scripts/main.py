@@ -26,13 +26,13 @@ if __name__ == "__main__":
     trusted_profiles = get_trusted_profiles(access_token)
 
     # Find the relevant account group ID
-    if CONFIG.get("target_by") == "account_group_name":
-        account_group_id = get_relevant_account_group_id(
-            account_groups, CONFIG.get("target_value")[0]
-        )
+    if CONFIG.get("account_group_id"):
+#        account_group_id = get_relevant_account_group_id(
+#            account_groups, CONFIG.get("target_value")[0]
+#        )
         
         # Fetch the list accounts in the respective account group
-        relevant_accounts = get_account_list(enterprise_id, account_group_id, access_token)
+        relevant_accounts = get_account_list(enterprise_id, CONFIG.get("account_group_id"), access_token)
         
         # Create a dictionary of relevant accounts for quick lookup
         relevant_accounts_dict = {
@@ -44,8 +44,10 @@ if __name__ == "__main__":
             trusted_profiles, relevant_accounts_dict
         )
         
-    elif CONFIG.get("target_by") == "accounts_list":
-        relevant_accounts = CONFIG.get("target_value")
+    elif CONFIG.get("account_list"):
+        relevant_accounts = create_account_identity_map(enterprise_id, access_token, CONFIG.get("account_list"))
+        print(relevant_accounts)
+        #relevant_accounts = CONFIG.get("account_list")
          # Filter the trusted profiles to include account ID, profile ID, and account name
         filtered_trusted_profiles = filter_trusted_profiles(
             trusted_profiles, relevant_accounts

@@ -34,7 +34,6 @@ def get_trusted_profiles(access_token):
         pi_logger.info(
             f"End: Fetched all trusted profiles."
         )
-        print(response.json())
         return response.json()["profiles"]
     else:
         pi_logger.error(f"Error Failed to get trusted profiles: {error}")
