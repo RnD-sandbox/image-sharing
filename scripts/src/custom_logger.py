@@ -33,9 +33,9 @@ class ImageShareLogger:
 
     def get_log(self):
         return {
-            "import_success": self.success_list,
-            "import_skipped": self.skipped_list,
-            "import_failed": self.failed_list,
+            "success": self.success_list,
+            "skipped": self.skipped_list,
+            "failed": self.failed_list,
             "other": self.other,
         }
 
@@ -71,15 +71,15 @@ def merge_image_op_logs(account_level_logs):
         dict: A dictionary containing merged active and inactive logs.
     """
     final_log = {
-        "import_success": [],
-        "import_skipped": [],
-        "import_failed": [],
+        "success": [],
+        "skipped": [],
+        "failed": [],
         "other": [],
     }
     for log in account_level_logs:
-        final_log["import_success"].extend(log["import_success"])
-        final_log["import_skipped"].extend(log["import_skipped"])
-        final_log["import_failed"].extend(log["import_failed"])
+        final_log["success"].extend(log["success"])
+        final_log["skipped"].extend(log["skipped"])
+        final_log["failed"].extend(log["failed"])
         final_log["other"].extend(log["other"])
     return final_log
 

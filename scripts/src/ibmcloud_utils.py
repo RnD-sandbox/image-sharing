@@ -2,6 +2,7 @@ import json
 import multiprocessing
 import os
 import sys
+import time
 
 from src.custom_logger import (
     ImageShareLogger,
@@ -82,7 +83,7 @@ def filter_trusted_profiles(trusted_profiles, relevant_accounts_dict):
         {
             "account_id": profile["account_id"],
             "profile_id": profile["id"],
-            "name": relevant_accounts_dict.get(profile["account_id"], "Unknown"),
+            "name": profile["name"],
         }
         for profile in trusted_profiles
         if profile["account_id"] in relevant_accounts_dict
@@ -345,6 +346,21 @@ def process_image(boot_image_name, boot_images):
     else:
         return None, False
 
+
+def fetch_status(sleep_duration, filtered_trusted_profiles, access_token, log_file_name):
+    with open(log_file_name, "r") as file:
+        log_file = json.load(file)
+        if log_file['success']:
+            pi_logger.info(
+                f"Initiating sleep for {sleep_duration} seconds before status check."
+            )
+            time.sleep(sleep_duration)
+            log_image_status_file_name = CONFIG.get("log_image_status_file_name")
+            get_image_import_status_from_accounts(filtered_trusted_profiles, access_token, log_image_status_file_name)
+        else:
+            pi_logger.info(
+                f"No requests were found. Successful operation list empty."
+            )
 
 def write_logs_to_file(logger, file_name):
     with open(file_name, "w", encoding="utf-8") as f:

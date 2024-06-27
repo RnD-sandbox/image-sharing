@@ -3,7 +3,7 @@ import os
 
 from src.api_requests import *
 from src.log_utils import *
-
+from src.constants import CONFIG
 
 
 def get_powervs_workspaces(bearer_token):
@@ -39,13 +39,13 @@ def import_boot_image(workspace, bearer_token):
         "CRN": workspace["details"]["crn"],
     }
     request_data = {
-        "imageName": os.getenv("POWERVS_IMAGE_NAME"),
-        "region": os.getenv("COS_REGION"),
-        "imageFilename": os.getenv("COS_IMAGE_FILE_NAME"),
-        "bucketName": os.getenv("COS_BUCKET_NAME"),
+        "imageName": CONFIG.get("image_name"),
+        "region": CONFIG.get("cos_bucket_details")["cos_region"],
+        "imageFilename": CONFIG.get("cos_bucket_details")["cos_image_file_name"],
+        "bucketName": CONFIG.get("cos_bucket_details")["cos_bucket"],
         "accessKey": os.getenv("COS_ACCESS_KEY"),
         "secretKey": os.getenv("COS_SECRET_KEY"),
-        "storageType": os.getenv("COS_STORAGE_TYPE"),
+        "storageType": "tier3",
     }
     response, _err = post_request(
         request_url, request_headers, json.dumps(request_data)

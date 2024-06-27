@@ -1,0 +1,29 @@
+# The enterprise account id
+enterprise_id: ""
+
+# The method to target the accounts. Supported values - account_group_name, accounts_list
+target_by: "accounts_list"
+
+# The list of account pr
+target_value:
+  - ""
+  - ""
+
+# Nuke enterprise sub accounts and account groups, defaults to False if no value is given
+image_operation: "IMPORT"
+
+image_name: "my-image-catalog-name"
+
+import_details:
+  license_type: "byol"
+  product: "Hana"
+  vendor: "SAP"
+
+cos_bucket_details:
+  cos_region: "eu-de"
+  cos_bucket: "sap-hyperscalar"
+  cos_image_file_name: "rh-9-2-sap-2703.ova.gz"
+
+log_operation_file_name: "pi_image_manager_log.json"
+
+log_image_status_file_name: "pi_image_status_log.json"
