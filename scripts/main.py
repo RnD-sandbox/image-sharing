@@ -1,7 +1,7 @@
 from src.ibmcloud_cos import *
 from src.ibmcloud_utils import *
 from src.log_utils import *
-from src.constants import CONFIG
+from src.constants import CONFIG, validate_config
 
 pi_logger = logging.getLogger("logger")
 
@@ -14,6 +14,8 @@ if __name__ == "__main__":
     """
     Main function to coordinate the script execution.
     """
+    # Validate config.yaml 
+    validate_config()
 
     enterprise_id = CONFIG.get("enterprise_id")
     # Authenticate and get the bearer token
@@ -27,9 +29,6 @@ if __name__ == "__main__":
 
     # Find the relevant account group ID
     if CONFIG.get("account_group_id"):
-#        account_group_id = get_relevant_account_group_id(
-#            account_groups, CONFIG.get("target_value")[0]
-#        )
         
         # Fetch the list accounts in the respective account group
         relevant_accounts = get_account_list(enterprise_id, CONFIG.get("account_group_id"), access_token)
@@ -45,10 +44,11 @@ if __name__ == "__main__":
         )
         
     elif CONFIG.get("account_list"):
+        
+        # Map all the account ids in account_list to their respective account name
         relevant_accounts = create_account_identity_map(enterprise_id, access_token, CONFIG.get("account_list"))
         print(relevant_accounts)
-        #relevant_accounts = CONFIG.get("account_list")
-         # Filter the trusted profiles to include account ID, profile ID, and account name
+        # Filter the trusted profiles to include account ID, profile ID, and account name        
         filtered_trusted_profiles = filter_trusted_profiles(
             trusted_profiles, relevant_accounts
         )

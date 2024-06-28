@@ -12,7 +12,7 @@ account_group_id: "4993d44c96a94a75b95f73075f787f59"
 # The list of account pr
 account_list:
 
-image_operation: "IMPORT"
+image_operation: "DELETE"
 
 image_import_details:
   image_name: "my-image-catalog-name"
@@ -21,8 +21,8 @@ image_import_details:
   vendor: ""
 
 cos_bucket_details:
-  cos_region: "eu-de"
-  cos_bucket: "sap-hyperscalar"
+  cos_region: ""
+  cos_bucket: ""
   cos_image_file_name: "rh-9-2-sap-2703.ova.gz"
 
 log_operation_file_name: "pi_image_manager_log.json"

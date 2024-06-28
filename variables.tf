@@ -47,7 +47,7 @@ variable "cos_image_file_name" {
 }
 
 variable "cos_data" {
-  description = "Cloud Object Storage bucket name, region and file access credentials. Leave the default value for 'Delete image' operation."
+  description = "Cloud Object Storage bucket name, region and file access credentials. Keep the default value if selected operation is 'Delete image'."
   type = object({
     cos_region      = string
     cos_bucket_name = string

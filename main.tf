@@ -12,9 +12,9 @@ resource "local_file" "config_yaml" {
     account_list               = var.account_list
     image_operation            = var.image_operation
     image_name                 = var.image_import_details.image_name
-    license_type               = var.image_import_details.license_type
-    product                    = var.image_import_details.product
-    vendor                     = var.image_import_details.vendor
+    license_type               = var.image_import_details.license_type != null ? var.image_import_details.license_type : ""
+    product                    = var.image_import_details.product != null ? var.image_import_details.product : ""
+    vendor                     = var.image_import_details.vendor != null ? var.image_import_details.vendor : ""
     cos_region                 = var.cos_data != null ? var.cos_data.cos_region : ""
     cos_bucket                 = var.cos_data != null ? var.cos_data.cos_bucket_name : ""
     cos_image_file_name        = var.cos_image_file_name
@@ -37,9 +37,9 @@ resource "terraform_data" "trigger_vars" {
     account_list               = var.account_list
     image_operation            = var.image_operation
     image_name                 = var.image_import_details.image_name
-    license_type               = var.image_import_details.license_type
-    product                    = var.image_import_details.product
-    vendor                     = var.image_import_details.vendor
+    license_type               = var.image_import_details.license_type != null ? var.image_import_details.license_type : ""
+    product                    = var.image_import_details.product != null ? var.image_import_details.product : ""
+    vendor                     = var.image_import_details.vendor != null ? var.image_import_details.vendor : ""
     cos_region                 = var.cos_data != null ? var.cos_data.cos_region : ""
     cos_bucket                 = var.cos_data != null ? var.cos_data.cos_bucket_name : ""
     cos_image_file_name        = var.cos_image_file_name
@@ -60,6 +60,7 @@ resource "terraform_data" "pi_image_manager_exec" {
       pip3 install requests
       pip3 install boto3
       pip3 install pyyaml
+      pip3 install jsonschema
       python3 ./scripts/main.py
     EOT
 

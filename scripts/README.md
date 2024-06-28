@@ -19,6 +19,7 @@ This guide provides instruction on how to execute this Python module to import/d
 pip3 install requests
 pip3 install boto3
 pip3 install pyyaml
+pip3 install jsonschema
 ```
 
 ## Usage

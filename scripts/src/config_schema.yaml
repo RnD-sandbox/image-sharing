@@ -2,11 +2,12 @@ type: object
 properties:
   enterprise_id:
     type: string
-    minLength: 1
   account_group_id:
     type: string
   account_list:
-    type: array
+    type:
+      - array
+      - "null"
     items:
       type: string
   image_operation:
@@ -19,30 +20,20 @@ properties:
         type: string
         minLength: 1
       license_type:
-        type: string
+        type:
+          - string
+          - "null"
+        minLength: 0
       product:
-        type: string
+        type:
+          - string
+          - "null"
+        minLength: 0
       vendor:
-        type: string
-    allOf:
-      - if:
-          properties:
-            license_type:
-              minLength: 1
-        then:
-          required: ["product", "vendor"]
-      - if:
-          properties:
-            product:
-              minLength: 1
-        then:
-          required: ["license_type", "vendor"]
-      - if:
-          properties:
-            vendor:
-              minLength: 1
-        then:
-          required: ["license_type", "product"]
+        type:
+          - string
+          - "null"
+        minLength: 0
     required: ["image_name"]
   cos_bucket_details:
     type: object
@@ -53,6 +44,7 @@ properties:
         type: string
       cos_image_file_name:
         type: string
+    required: ["cos_region", "cos_bucket", "cos_image_file_name"]
   log_operation_file_name:
     type: string
   log_image_status_file_name:
@@ -67,3 +59,6 @@ oneOf:
     properties:
       account_group_id:
         maxLength: 0
+anyOf:
+  - required: ["account_group_id"]
+  - required: ["account_list"]

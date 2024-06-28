@@ -1,5 +1,6 @@
 import logging
 
+pi_logger = logging.getLogger("logger")
 
 def configure_logging(log_file_path="console.log"):
     # Create a custom logger
