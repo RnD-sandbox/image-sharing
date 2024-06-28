@@ -3,7 +3,9 @@ properties:
   enterprise_id:
     type: string
   account_group_id:
-    type: string
+    type:
+      - string
+      - "null"
   account_list:
     type:
       - array

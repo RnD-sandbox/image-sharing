@@ -19,7 +19,6 @@ from src.constants import CONFIG
 
 pi_logger = logging.getLogger("logger")
 
-
 def get_enterprise_bearer_token(api_key):
     """
     Generate a bearer token using the provided API key.
@@ -130,6 +129,7 @@ def deploy_image_to_child_accounts(account_list, enterprise_access_token, log_fi
             results = pool.starmap(deploy_image_to_account, args)
             final_log = merge_image_op_logs(results)
             write_logs_to_file(final_log, log_file)
+    return final_log
 
 
 def deploy_image_to_account(account, enterprise_access_token):
@@ -188,7 +188,7 @@ def import_image_to_workspace(workspace, bearer_token, logger):
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
     if boot_images_response:
         image_found, is_active = process_image(
-            CONFIG.get("cos_bucket_details")["cos_image_file_name"],
+            CONFIG.get("image_import_details")["image_name"],
             boot_images_response.json()["images"],
         )
         if image_found and is_active:

@@ -1,0 +1,37 @@
+# The enterprise account id
+enterprise_id: "bb9cf7ad84ba4e95af1ffe4ee060f255"
+
+# IMPORTANT
+# You can target the accounts with either account_group_id or account_list
+# To share across account group with a list of accounts, provide account_group_id
+# To share a specific list of accounts, provide account ids as a list in account_list
+# Do not provide both account_group_id & account_list
+
+# ID of the parent account group.
+account_group_id: 4993d44c96a94a75b95f73075f787f59
+
+# List of account IDs to target.
+account_list:
+
+# The import or delete operation to be performed for the custom PowerVS boot image. Accepted values are: IMPORT & DELETE.
+image_operation: IMPORT
+
+# This attribute is required only when image_operation is IMPORT
+# The name under which the boot image is visible in the PowerVS workspace, along with the license_type, product, and vendor details for SAP images.
+# License type supported values: 'byol'; product supported values: 'Hana', 'Netweaver'; vendor allowable value: 'SAP'.
+image_import_details:
+  image_name: test-image
+  license_type: byol
+  product: "Hana"
+  vendor: SAP
+
+# This attribute is required only when image_operation is IMPORT
+# Cloud Object Storage bucket name, region and file name.
+cos_bucket_details:
+  cos_region: "eu-de"
+  cos_bucket: "sap-hyperscalar"
+  cos_image_file_name: "rh-9-2-sap-2703.ova.gz"
+
+# File names for logs.
+log_operation_file_name: "log_operation.json"
+log_image_status_file_name: "log_image_status.json"

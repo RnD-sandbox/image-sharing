@@ -46,9 +46,9 @@ def validate_config():
                     )
                 else:
                     valid_licenseType = valid_product = valid_vendor = None
-                    pi_logger.info("All values are null or empty.")
+                    pi_logger.info("LicenseType, product and vendor are null or empty.")
             else:
-                pi_logger.error("One or more values are invalid.")
+                pi_logger.error("ERROR: LicenseType, product and vendor has invalid values. Supported values are license_type:byol, product:Hana,Netweaver, vendor:SAP")
                 sys.exit(1)
         else:
             pi_logger.error(

@@ -32,6 +32,6 @@ cos_bucket_details:
   cos_bucket: "${cos_bucket}"
   cos_image_file_name: "${cos_image_file_name}"
 
+# File names for logs
 log_operation_file_name: "${log_operation_file_name}"
-
 log_image_status_file_name: "${log_image_status_file_name}"
