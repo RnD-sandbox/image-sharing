@@ -1,7 +1,6 @@
 # The enterprise account id
 enterprise_id: "xxxxxxxxxxxxxxxxxx"
 
-Tests
 # IMPORTANT
 # You can target the accounts with either account_group_id or account_list
 # To share across account group with a list of accounts, provide account_group_id
