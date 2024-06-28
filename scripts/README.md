@@ -9,7 +9,7 @@ This guide provides instruction on how to execute this Python module to import/d
 - Custom OS images loaded into a COS bucket
 - IBM cloud enterprise account
 - Target IBM Cloud account linked to the enterprise account with 'Trusted Profiles'
-- Trget account IDs or the name of an account group
+- Target account IDs or the name of an account group
 - Python 3.x installed on your machine.
 - `config.yaml` file with the required configuration.
 
