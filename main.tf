@@ -1,6 +1,13 @@
 locals {
   log_operation_file_name    = "pi_image_manager_log.json"
   log_image_status_file_name = "pi_image_status_log.json"
+
+  is_cos_data_valid                = (var.image_operation == "IMPORT" && var.cos_data != null) || var.image_operation == "DELETE" ? true : false
+  cos_data_validate_msg            = "The cos_data is null. The import operation of custom images requires cos_data."
+  cos_data_chk                     = regex("^${local.cos_data_validate_msg}$", (local.is_cos_data_valid ? local.cos_data_validate_msg : ""))
+  is_cos_image_file_name_valid     = (var.image_operation == "IMPORT" && var.cos_image_file_name != null && var.cos_image_file_name != "") || var.image_operation == "DELETE" ? true : false
+  cos_image_file_name_validate_msg = "The cos_image_file_name is null or empty. The import operation of custom images requires cos_image_file_name."
+  cos_image_file_name_chk          = regex("^${local.cos_image_file_name_validate_msg}$", (local.is_cos_image_file_name_valid ? local.cos_image_file_name_validate_msg : ""))
 }
 
 provider "local" {}
