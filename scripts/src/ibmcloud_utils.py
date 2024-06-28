@@ -69,13 +69,14 @@ def get_relevant_account_group_id(account_groups, target_name):
         f"Error Account group name {os.getenv('IBMCLOUD_ACCOUNT_GROUP_NAME')} doesn't exist in the provided Enterprise account : {target_name}"
     )
     sys.exit(1)
-    
+
+
 def create_account_identity_map(enterprise_id, access_token, account_list):
     """
     Creates an (id, name) map using the data from account groups  for the accounts mentioned in account_list
     Args:
-        enterprise_id: Enterprise id 
-        access_token: Access token created using the service id api key of the enterprise account 
+        enterprise_id: Enterprise id
+        access_token: Access token created using the service id api key of the enterprise account
         account_list: The list of account from config.yaml
     Returns:
         filtered_profiles: List of filtered trusted profiles.
@@ -83,15 +84,16 @@ def create_account_identity_map(enterprise_id, access_token, account_list):
     # Fetch the list of account groups
     account_groups = get_account_group_list(enterprise_id, access_token)
     relevant_account_info = {}
-    
+
     # get the name for the accounts mentioned in account_list
     for account_group in account_groups:
-        relevant_accounts = get_account_list(enterprise_id, account_group['id'], access_token)
+        relevant_accounts = get_account_list(
+            enterprise_id, account_group["id"], access_token
+        )
         for account in relevant_accounts:
-            if account['id'] in account_list:
-                relevant_account_info[account['id']] = account['name']
-                #relevant_account_info.append({"id": account['id'], "name": account['name']})
-                
+            if account["id"] in account_list:
+                relevant_account_info[account["id"]] = account["name"]
+
     return relevant_account_info
 
 
@@ -186,7 +188,8 @@ def import_image_to_workspace(workspace, bearer_token, logger):
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
     if boot_images_response:
         image_found, is_active = process_image(
-            CONFIG.get("cos_bucket_details")["cos_image_file_name"], boot_images_response.json()["images"]
+            CONFIG.get("cos_bucket_details")["cos_image_file_name"],
+            boot_images_response.json()["images"],
         )
         if image_found and is_active:
             logger.log_skipped(workspace)
@@ -271,7 +274,8 @@ def delete_image_from_workspace(workspace, account, bearer_token, logger):
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
     if boot_images_response:
         image_found, is_active = process_image(
-            CONFIG.get("image_import_details")["image_name"], boot_images_response.json()["images"]
+            CONFIG.get("image_import_details")["image_name"],
+            boot_images_response.json()["images"],
         )
         if image_found and is_active:
             response, _error = delete_boot_image(
@@ -343,7 +347,8 @@ def status_check_from_workspace(workspace, bearer_token, logger):
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
     if boot_images_response:
         image_found, is_active = process_image(
-            CONFIG.get("image_import_details")["image_name"], boot_images_response.json()["images"]
+            CONFIG.get("image_import_details")["image_name"],
+            boot_images_response.json()["images"],
         )
         if image_found and is_active:
             logger.active.append({"id": workspace["id"], "name": workspace["name"]})
@@ -371,20 +376,22 @@ def process_image(boot_image_name, boot_images):
         return None, False
 
 
-def fetch_status(sleep_duration, filtered_trusted_profiles, access_token, log_file_name):
+def fetch_status(
+    sleep_duration, filtered_trusted_profiles, access_token, log_file_name
+):
     with open(log_file_name, "r") as file:
         log_file = json.load(file)
-        if log_file['success']:
+        if log_file["success"]:
             pi_logger.info(
                 f"Initiating sleep for {sleep_duration} seconds before status check."
             )
             time.sleep(sleep_duration)
             log_image_status_file_name = CONFIG.get("log_image_status_file_name")
-            get_image_import_status_from_accounts(filtered_trusted_profiles, access_token, log_image_status_file_name)
-        else:
-            pi_logger.info(
-                f"No requests were found. Successful operation list empty."
+            get_image_import_status_from_accounts(
+                filtered_trusted_profiles, access_token, log_image_status_file_name
             )
+        else:
+            pi_logger.info(f"No requests were found. Successful operation list empty.")
 
 
 def write_logs_to_file(logger, file_name):
