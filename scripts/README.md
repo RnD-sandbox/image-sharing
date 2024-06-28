@@ -24,8 +24,10 @@ pip3 install jsonschema
 
 ## Usage
 1. Export environment variables:
-    `export IBMCLOUD_API_KEY=xxxxxxxx`
-    `export COS_ACCESS_KEY=xxxxxxxxxx`
-    `export COS_SECRET_KEY=xxxxxxxxxx`
+    ```
+    export IBMCLOUD_API_KEY=xxxxxxxx
+    export COS_ACCESS_KEY=xxxxxxxxxx
+    export COS_SECRET_KEY=xxxxxxxxxx
+    ```
 2. Edit the `config.yaml` file found in the folder according to your requirements.
 3. Execute the script using command: `python3 main.py`
