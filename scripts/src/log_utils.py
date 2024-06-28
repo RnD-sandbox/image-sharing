@@ -1,8 +1,10 @@
 import logging
 
-def configure_logging(log_file_path='app.log'):
+pi_logger = logging.getLogger("logger")
+
+def configure_logging(log_file_path="console.log"):
     # Create a custom logger
-    logger = logging.getLogger('my_logger')
+    logger = logging.getLogger("logger")
     logger.setLevel(logging.DEBUG)
 
     # Create handlers
@@ -12,8 +14,8 @@ def configure_logging(log_file_path='app.log'):
     f_handler.setLevel(logging.DEBUG)
 
     # Create formatters and add it to handlers
-    c_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    c_format = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    f_format = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     c_handler.setFormatter(c_format)
     f_handler.setFormatter(f_format)
 
@@ -23,6 +25,7 @@ def configure_logging(log_file_path='app.log'):
         logger.addHandler(f_handler)
 
     return logger
+
 
 # Configure logging when the module is imported
 configure_logging()

@@ -1,0 +1,64 @@
+type: object
+properties:
+  enterprise_id:
+    type: string
+  account_group_id:
+    type: string
+  account_list:
+    type:
+      - array
+      - "null"
+    items:
+      type: string
+  image_operation:
+    type: string
+    enum: ["IMPORT", "STATUS", "DELETE"]
+  image_import_details:
+    type: object
+    properties:
+      image_name:
+        type: string
+        minLength: 1
+      license_type:
+        type:
+          - string
+          - "null"
+        minLength: 0
+      product:
+        type:
+          - string
+          - "null"
+        minLength: 0
+      vendor:
+        type:
+          - string
+          - "null"
+        minLength: 0
+    required: ["image_name"]
+  cos_bucket_details:
+    type: object
+    properties:
+      cos_region:
+        type: string
+      cos_bucket:
+        type: string
+      cos_image_file_name:
+        type: string
+    required: ["cos_region", "cos_bucket", "cos_image_file_name"]
+  log_operation_file_name:
+    type: string
+  log_image_status_file_name:
+    type: string
+required: ["enterprise_id", "image_operation", "image_import_details"]
+oneOf:
+  - required: ["account_group_id"]
+    properties:
+      account_list:
+        maxItems: 0
+  - required: ["account_list"]
+    properties:
+      account_group_id:
+        maxLength: 0
+anyOf:
+  - required: ["account_group_id"]
+  - required: ["account_list"]

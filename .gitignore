@@ -3,9 +3,11 @@
 /.vscode
 /dev
 /trials
+/test
 scripts/dev/
 steps.txt
-
+*.tfvars
+.venv
 **/.terraform/*
 **/__pycache__/*
 *.log*
@@ -19,3 +21,4 @@ sample.json
 test.json
 *steps.txt
 .DS_Store
+.terraform/
