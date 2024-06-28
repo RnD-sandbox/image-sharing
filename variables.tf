@@ -10,13 +10,13 @@ variable "enterprise_id" {
 }
 
 variable "account_group_id" {
-  description = "ID of the parent account group. leave empty to use account list."
+  description = "ID of the parent account group. Keep the string empty to use the account list."
   type        = string
   default     = ""
 }
 
 variable "account_list" {
-  description = "List of account IDs to target; leave empty to use account groups."
+  description = "List of account IDs to target. Keep the list empty to target child accounts using account group id."
   type        = list(string)
   default     = []
 }
