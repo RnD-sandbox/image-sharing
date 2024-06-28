@@ -77,8 +77,8 @@ resource "terraform_data" "pi_image_manager_exec" {
 }
 
 resource "terraform_data" "display_logs" {
-  depends_on = [terraform_data.pi_image_manager_exec]
-
+  depends_on       = [terraform_data.pi_image_manager_exec]
+  triggers_replace = terraform_data.trigger_vars
   provisioner "local-exec" {
 
     command = <<-EOT
