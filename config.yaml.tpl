@@ -20,7 +20,7 @@ account_list:
 image_operation: "${image_operation}"
 
 # The name under which the boot image is visible in the PowerVS workspace, along with the license_type, product, and vendor details for SAP images. License type supported values: 'byol'; product supported values: 'Hana', 'Netweaver'; vendor allowable value: 'SAP'.
-image_import_details:
+image_details:
   image_name: "${image_name}"
   license_type: "${license_type}"
   product: "${product}"

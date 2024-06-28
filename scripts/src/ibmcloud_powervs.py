@@ -39,16 +39,16 @@ def import_boot_image(workspace, bearer_token):
         "CRN": workspace["details"]["crn"],
     }
     request_data = {
-        "imageName": CONFIG.get("image_import_details")["image_name"],
+        "imageName": CONFIG.get("image_details")["image_name"],
         "region": CONFIG.get("cos_bucket_details")["cos_region"],
         "imageFilename": CONFIG.get("cos_bucket_details")["cos_image_file_name"],
         "bucketName": CONFIG.get("cos_bucket_details")["cos_bucket"],
         "accessKey": os.getenv("COS_ACCESS_KEY"),
         "secretKey": os.getenv("COS_SECRET_KEY"),
         "storageType": "tier3",
-        "licenseType": CONFIG.get("image_import_details")["license_type"],
-        "product": CONFIG.get("image_import_details")["product"],
-        "vendor": CONFIG.get("image_import_details")["vendor"],
+        "licenseType": CONFIG.get("image_details")["license_type"],
+        "product": CONFIG.get("image_details")["product"],
+        "vendor": CONFIG.get("image_details")["vendor"],
     }
     response, _err = post_request(
         request_url, request_headers, json.dumps(request_data)

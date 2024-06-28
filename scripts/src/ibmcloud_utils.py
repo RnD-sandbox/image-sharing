@@ -188,7 +188,7 @@ def import_image_to_workspace(workspace, bearer_token, logger):
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
     if boot_images_response:
         image_found, is_active = process_image(
-            CONFIG.get("image_import_details")["image_name"],
+            CONFIG.get("image_details")["image_name"],
             boot_images_response.json()["images"],
         )
         if image_found and is_active:
@@ -274,7 +274,7 @@ def delete_image_from_workspace(workspace, account, bearer_token, logger):
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
     if boot_images_response:
         image_found, is_active = process_image(
-            CONFIG.get("image_import_details")["image_name"],
+            CONFIG.get("image_details")["image_name"],
             boot_images_response.json()["images"],
         )
         if image_found and is_active:
@@ -347,7 +347,7 @@ def status_check_from_workspace(workspace, bearer_token, logger):
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
     if boot_images_response:
         image_found, is_active = process_image(
-            CONFIG.get("image_import_details")["image_name"],
+            CONFIG.get("image_details")["image_name"],
             boot_images_response.json()["images"],
         )
         if image_found and is_active:

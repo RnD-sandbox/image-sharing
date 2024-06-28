@@ -18,9 +18,9 @@ def validate_config():
         schema = yaml.safe_load(file)
         validate(CONFIG, schema)
 
-        licenseType = CONFIG.get("image_import_details")["license_type"]
-        product = CONFIG.get("image_import_details")["product"]
-        vendor = CONFIG.get("image_import_details")["vendor"]
+        licenseType = CONFIG.get("image_details")["license_type"]
+        product = CONFIG.get("image_details")["product"]
+        vendor = CONFIG.get("image_details")["vendor"]
 
         # Accepted values
         valid_licenseTypes = ["byol"]
