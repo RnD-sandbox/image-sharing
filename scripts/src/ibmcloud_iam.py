@@ -50,7 +50,7 @@ def get_account_group_list(enterprise_id, iam_token):
 
     if response:
         pi_logger.info(
-            f"END: Fetched account groups in Enterprise account with ID {enterprise_id}"
+            f"End: Fetched account groups in Enterprise account with ID {enterprise_id}"
         )
         return response.json()["resources"]
     else:
@@ -78,7 +78,7 @@ def get_account_list(enterprise_id, account_group_id, iam_token):
     response, error = get_request(req_url, req_headers, req_params)
     if response:
         pi_logger.info(
-            f"END: Fetched list of accounts under the account group id {account_group_id} ..."
+            f"End: Fetched list of accounts under the account group id {account_group_id} ..."
         )
         return response.json()["resources"]
     else:

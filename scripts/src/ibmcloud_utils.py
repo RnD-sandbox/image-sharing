@@ -34,7 +34,7 @@ def get_enterprise_bearer_token(api_key):
     response, error = generate_bearer_token(api_key)
     if response:
         pi_logger.info(
-            "END: Generated bearer token for enterprise account using IBMCLOUD API Key."
+            "End: Generated bearer token for enterprise account using IBMCLOUD API Key."
         )
         return response.json()["access_token"]
     else:
