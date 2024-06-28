@@ -22,4 +22,3 @@ test.json
 *steps.txt
 .DS_Store
 .terraform/
-scripts/config.yaml
