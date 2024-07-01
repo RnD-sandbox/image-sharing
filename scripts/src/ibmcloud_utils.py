@@ -87,14 +87,15 @@ def image_ops_on_child_accounts(action, account_list, enterprise_access_token, l
         log_file: Filename to store logs.
     """
     operation = {
-        "delete": {"function": image_ops_on_child_account, "message": "Delete image failed for following accounts", "sleep": 180},
-        "import": {"function": image_ops_on_child_account, "message": "Import image failed for following accounts", "sleep": 600},
+        "delete": {"message": "Delete image failed for following accounts", "sleep": 180},
+        "import": {"message": "Import image failed for following accounts", "sleep": 600},
     }
 
     if account_list:
         args = [(action, account, enterprise_access_token) for account in account_list]
         with multiprocessing.Pool(processes=5) as pool:
-            results = pool.starmap(operation[action]["function"], args)
+            results = pool.starmap(image_ops_on_child_account, args)
+
         final_log = merge_image_op_logs(results)
         write_logs_to_file(final_log, log_file)
         fetch_status(final_log, operation[action]["sleep"])
@@ -181,6 +182,7 @@ def import_image_to_workspace(workspace, bearer_token, logger):
         elif (latest_job_status and latest_job_status.json()["status"]["state"]) == "running":
             logger.log_skipped(workspace, "Another import job already running.")
         else:
+            # Import boot image
             response, _error = import_boot_image(workspace, bearer_token)
             if response:
                 logger.log_success(workspace)
@@ -198,11 +200,10 @@ def delete_image_from_workspace(workspace, bearer_token, logger):
     """
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
     if boot_images_response:
-        image_found, is_active = process_image(
-            CONFIG.get("image_details")["image_name"],
-            boot_images_response.json()["images"],
-        )
+        # check if the image exists
+        image_found, is_active = process_image(CONFIG.get("image_details")["image_name"], boot_images_response.json()["images"])
         if image_found and is_active:
+            # Delete boot image
             response, _error = delete_boot_image(image_found["imageID"], workspace, bearer_token)
             if response:
                 logger.log_success(workspace)
@@ -239,9 +240,9 @@ def fetch_status(log_obj, sleep_duration):
         pi_logger.info(f"Initiating status checks ...")
         count = 0
         while count < 7:
+            status_list = []
             for account in log_obj["success"]:
                 for workspace in account["workspaces"]:
-                    status_list = []
                     response, _err = get_cos_image_import_status(workspace, enterprise_access_token)
                     if response:
                         if response.json()["status"]["state"] != "completed":
