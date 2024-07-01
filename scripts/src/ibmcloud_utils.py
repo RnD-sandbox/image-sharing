@@ -137,35 +137,36 @@ def image_ops_on_workspaces(action, account, bearer_token):
     Returns:
         logger
     """
-    operation = {
-        "delete": {"function": delete_image_from_workspace},
-        "import": {"function": import_image_to_workspace},
-    }
     logger = ImageShareLogger()
     powervs_workspaces_response, _error = get_powervs_workspaces(bearer_token)
     if powervs_workspaces_response:
         power_workspaces = powervs_workspaces_response.json()["workspaces"]
         for workspace in power_workspaces:
-            operation[action]["function"](workspace, bearer_token, logger)
+            image_ops_on_workspace(action, workspace, bearer_token, logger)
     else:
         logger.log_other(account, f"Failed to fetch the Power Virtual Server workspaces for {account}, {_error}")
     return logger
 
 
-def import_image_to_workspace(workspace, bearer_token, logger):
+def image_ops_on_workspace(action, workspace, bearer_token, logger):
     """
-    Imports image to a single workspace.
+    Manages image in a single workspace by importing or deleting it.
 
     Args:
         workspace: Dictionary containing workspace details.
         bearer_token: Bearer token for the account.
-        logger
+        logger: Logger object for logging operations.
+        operation: String specifying the operation ('import' or 'delete').
     """
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
-    if boot_images_response:
-        # check if the image already exists
-        image_found, is_active = process_image(CONFIG.get("image_details")["image_name"], boot_images_response.json()["images"])
+    if not boot_images_response:
+        logger.log_failure(workspace, _error)
+        return
 
+    # Check image status in a workspace
+    image_found, is_active = process_image(CONFIG.get("image_details")["image_name"], boot_images_response.json()["images"])
+
+    if action == "import":
         # check if there is already an image import job running
         latest_job_status, _error = get_cos_image_import_status(
             {
@@ -189,21 +190,9 @@ def import_image_to_workspace(workspace, bearer_token, logger):
             else:
                 logger.log_failure(workspace, _error)
 
-
-def delete_image_from_workspace(workspace, bearer_token, logger):
-    """
-    Deletes image from a single workspace.
-
-    Args:
-        workspace: Dictionary containing workspace details.
-        bearer_token: Bearer token for the account.
-    """
-    boot_images_response, _error = get_boot_images(workspace, bearer_token)
-    if boot_images_response:
-        # check if the image exists
-        image_found, is_active = process_image(CONFIG.get("image_details")["image_name"], boot_images_response.json()["images"])
+    elif action == "delete":
         if image_found and is_active:
-            # Delete boot image
+            # Delete boot image from workspace
             response, _error = delete_boot_image(image_found["imageID"], workspace, bearer_token)
             if response:
                 logger.log_success(workspace)
@@ -212,14 +201,19 @@ def delete_image_from_workspace(workspace, bearer_token, logger):
         else:
             logger.log_skipped(workspace, "The image does not exist.")
 
+    else:
+        logger.log_failure(workspace, "Invalid operation specified.")
+
 
 def process_image(boot_image_name, boot_images):
     """
     Filter the concerned image from the list of boot images and checks if it's status is active.
 
-    :param boot_image_name: Name of the boot image to be imported or deleted.
-    :param boot_images: List of boot images.
-    :return: The concerned image dictionary or None.
+    Args:
+        boot_image_name: Name of the boot image to be imported or deleted.
+        boot_images: List of boot images.
+    Returns:
+        The concerned image dictionary or None.
     """
     concerned_image = list(filter(lambda image: image.get("name", "") == boot_image_name, boot_images))
     if concerned_image:
