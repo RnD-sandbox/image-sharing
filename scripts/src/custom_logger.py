@@ -86,7 +86,7 @@ def merge_image_op_logs(account_level_logs):
 
 def log_account_level_image_op(account_logger, workspace_logger, account):
     """
-    Group the image import statuses from workspaces of an account with account infomartion.
+    Group the image import statuses from workspaces of an account with account information.
 
     Args:
         account_logger (Logger): The logger to log account-level statuses.
@@ -143,7 +143,7 @@ def merge_status_logs(account_level_logs):
 
 def log_account_level_status(account_logger, workspace_logger, account):
     """
-    Group the image import statuses from workspaces of an account with account infomartion.
+    Group the image import statuses from workspaces of an account with account information.
 
     Args:
         account_logger (Logger): The logger to log account-level statuses.

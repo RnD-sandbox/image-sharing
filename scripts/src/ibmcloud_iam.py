@@ -25,15 +25,11 @@ def get_trusted_profiles(access_token):
     req_url = "https://iam.cloud.ibm.com/identity/profiles"
     req_headers = {"Content-Type": "application/x-www-form-urlencoded"}
     req_params = {"access_token": access_token}
-    pi_logger.info(
-        f"Start: Fetching the trusted profiles ..."
-    )
+    pi_logger.info(f"Start: Fetching the trusted profiles ...")
     response, error = get_request(req_url, req_headers, req_params)
 
     if response:
-        pi_logger.info(
-            f"End: Fetched all trusted profiles."
-        )
+        pi_logger.info(f"End: Fetched all trusted profiles.")
         return response.json()["profiles"]
     else:
         pi_logger.error(f"Error Failed to get trusted profiles: {error}")
@@ -54,7 +50,7 @@ def get_account_group_list(enterprise_id, iam_token):
 
     if response:
         pi_logger.info(
-            f"END: Fetched account groups in Enterprise account with ID {enterprise_id}"
+            f"End: Fetched account groups in Enterprise account with ID {enterprise_id}"
         )
         return response.json()["resources"]
     else:
@@ -82,7 +78,7 @@ def get_account_list(enterprise_id, account_group_id, iam_token):
     response, error = get_request(req_url, req_headers, req_params)
     if response:
         pi_logger.info(
-            f"END: Fetched list of accounts under the account group id {account_group_id} ..."
+            f"End: Fetched list of accounts under the account group id {account_group_id} ..."
         )
         return response.json()["resources"]
     else:

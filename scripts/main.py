@@ -14,52 +14,37 @@ if __name__ == "__main__":
     """
     Main function to coordinate the script execution.
     """
-    # Validate config.yaml 
+    # Validate config.yaml
     validate_config()
-
     enterprise_id = CONFIG.get("enterprise_id")
     # Authenticate and get the bearer token
     access_token = get_enterprise_bearer_token(ibmcloud_api_key)
-
     # Fetch the list of account groups
     account_groups = get_account_group_list(enterprise_id, access_token)
-    
     # Fetch the list of trusted profiles
     trusted_profiles = get_trusted_profiles(access_token)
 
     # Find the relevant account group ID
     if CONFIG.get("account_group_id"):
-        
         # Fetch the list accounts in the respective account group
         relevant_accounts = get_account_list(enterprise_id, CONFIG.get("account_group_id"), access_token)
-        
         # Create a dictionary of relevant accounts for quick lookup
-        relevant_accounts_dict = {
-            account["id"]: account["name"] for account in relevant_accounts
-        }
-        
+        relevant_accounts_dict = { account["id"]: account["name"] for account in relevant_accounts }
         # Filter the trusted profiles to include account ID, profile ID, and account name
-        filtered_trusted_profiles = filter_trusted_profiles(
-            trusted_profiles, relevant_accounts_dict
-        )
-        
+        filtered_trusted_profiles = filter_trusted_profiles(trusted_profiles, relevant_accounts_dict)
+
     elif CONFIG.get("account_list"):
-        
         # Map all the account ids in account_list to their respective account name
         relevant_accounts = create_account_identity_map(enterprise_id, access_token, CONFIG.get("account_list"))
         print(relevant_accounts)
-        # Filter the trusted profiles to include account ID, profile ID, and account name        
-        filtered_trusted_profiles = filter_trusted_profiles(
-            trusted_profiles, relevant_accounts
-        )
-        
+        # Filter the trusted profiles to include account ID, profile ID, and account name
+        filtered_trusted_profiles = filter_trusted_profiles(trusted_profiles, relevant_accounts)
+
     if filtered_trusted_profiles:
         image_operation = CONFIG.get("image_operation")
         log_operation_file_name = CONFIG.get("log_operation_file_name")
         log_image_status_file_name = CONFIG.get("log_image_status_file_name")
-        pi_logger.info(
-            f"Initiating provided PowerVS boot image {image_operation} operation."
-        )
+        pi_logger.info(f"Initiating provided PowerVS boot image {image_operation} operation.")
         if image_operation == "IMPORT":
             # Check if cos credentials and image exists in bucket
             object_exists_in_ibm_cos(
@@ -69,27 +54,26 @@ if __name__ == "__main__":
                 CONFIG.get("cos_bucket_details")["cos_bucket"],
                 CONFIG.get("cos_bucket_details")["cos_image_file_name"],
             )
-
-            deploy_image_to_child_accounts(
-                filtered_trusted_profiles, access_token, log_operation_file_name
-            )
+            # Import the image
+            result = deploy_image_to_child_accounts(filtered_trusted_profiles, access_token, log_operation_file_name)
             fetch_status(1800, filtered_trusted_profiles, access_token, log_operation_file_name)
+            if result is not None and result["failed"]:
+                pi_logger.error(f"Import image failed for following accounts '{result['failed']}'.")
+                sys.exit(1)
 
         elif image_operation == "DELETE":
-            delete_image_from_child_accounts(
-                filtered_trusted_profiles, access_token, log_operation_file_name
-            )
-            fetch_status(300, filtered_trusted_profiles, access_token, log_operation_file_name)
+            # Delete the image
+            result = delete_image_from_child_accounts(filtered_trusted_profiles, access_token, log_operation_file_name)
+            fetch_status(180, filtered_trusted_profiles, access_token, log_operation_file_name)
+            if result is not None and result["failed"]:
+                pi_logger.error(f"Delete image failed for following accounts '{result['failed']}'.")
+                sys.exit(1)
 
         elif image_operation == "STATUS":
-            get_image_import_status_from_accounts(
-                filtered_trusted_profiles, access_token, log_image_status_file_name
-            )
+            get_image_import_status_from_accounts(filtered_trusted_profiles, access_token, log_image_status_file_name)
         else:
-            pi_logger.error(
-                f"Unidentified action '{image_operation}' passed. Supported operations are IMPORT and DELETE."
-            )
+            pi_logger.error(f"Unidentified action '{image_operation}' passed. Supported operations are IMPORT and DELETE.")
+            sys.exit(1)
     else:
-        pi_logger.error(
-            f"Could not find relevant trusted profiles."
-        )
+        pi_logger.error(f"Could not find relevant trusted profiles.")
+        sys.exit(1)

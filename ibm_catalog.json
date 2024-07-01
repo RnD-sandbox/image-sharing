@@ -35,21 +35,12 @@
               "required": true
             },
             {
-              "key": "account_group_name",
+              "key": "account_group_id",
               "required": true
             },
             {
-              "key": "cos_image_file_name",
+              "key": "account_list",
               "required": true
-            },
-            {
-              "key": "cos_data",
-              "required": true,
-              "custom_config": {
-                "grouping": "deployment",
-                "original_grouping": "deployment",
-                "type": "json_editor"
-              }
             },
             {
               "key": "image_operation",
@@ -68,8 +59,26 @@
               ]
             },
             {
-              "key": "image_name",
+              "key": "image_details",
+              "required": true,
+              "custom_config": {
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "type": "json_editor"
+              }
+            },
+            {
+              "key": "cos_image_file_name",
               "required": true
+            },
+            {
+              "key": "cos_data",
+              "required": true,
+              "custom_config": {
+                "grouping": "deployment",
+                "original_grouping": "deployment",
+                "type": "json_editor"
+              }
             }
           ]
         }

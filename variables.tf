@@ -30,31 +30,42 @@ variable "image_operation" {
   }
 }
 
-variable "image_import_details" {
-  description = "The name under which the boot image is visible in the PowerVS workspace, along with the license_type, product, and vendor details for SAP images. License type supported values: 'byol'; product supported values: 'Hana', 'Netweaver'; vendor allowable value: 'SAP'."
+variable "image_details" {
+  description = "The name under which the boot image is visible in the PowerVS workspace. When 'image_operation' is IMPORT Additional details like the license_type, product, and vendor details for images are required. If not can be left empty. License type supported values: 'byol'; product supported values: 'Hana', 'Netweaver'; vendor allowable value: 'SAP'."
   type = object({
     image_name   = string
     license_type = optional(string)
     product      = optional(string)
     vendor       = optional(string)
   })
+  default = {
+    image_name   = ""
+    license_type = ""
+    product      = ""
+    vendor       = ""
+  }
 }
 
 variable "cos_image_file_name" {
-  description = "Cloud Object Storage image filename."
+  description = "Name of the file in IBM Cloud Object Storage. Required only when 'image_operation' is set to IMPORT."
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "cos_data" {
-  description = "Cloud Object Storage bucket name, region and file access credentials. Keep the default value if selected operation is 'Delete image'."
+  description = "IBM Cloud Object Storage bucket name, region and file access credentials. Keep the default value if selected operation is 'Delete image'."
   type = object({
     cos_region      = string
     cos_bucket_name = string
     access_key      = string
     secret_key      = string
   })
-  default   = null
+  default = {
+    "cos_region" : "",
+    "cos_bucket_name" : "",
+    "access_key" : "",
+    "secret_key" : ""
+  }
   sensitive = true
 }
 

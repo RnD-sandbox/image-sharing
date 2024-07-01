@@ -3,7 +3,9 @@ properties:
   enterprise_id:
     type: string
   account_group_id:
-    type: string
+    type:
+      - string
+      - "null"
   account_list:
     type:
       - array
@@ -13,7 +15,7 @@ properties:
   image_operation:
     type: string
     enum: ["IMPORT", "STATUS", "DELETE"]
-  image_import_details:
+  image_details:
     type: object
     properties:
       image_name:
@@ -49,7 +51,7 @@ properties:
     type: string
   log_image_status_file_name:
     type: string
-required: ["enterprise_id", "image_operation", "image_import_details"]
+required: ["enterprise_id", "image_operation", "image_details"]
 oneOf:
   - required: ["account_group_id"]
     properties:
