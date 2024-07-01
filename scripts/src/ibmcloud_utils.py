@@ -19,6 +19,7 @@ from src.constants import CONFIG
 
 pi_logger = logging.getLogger("logger")
 
+
 def get_enterprise_bearer_token(api_key):
     """
     Generate a bearer token using the provided API key.
@@ -93,6 +94,12 @@ def create_account_identity_map(enterprise_id, access_token, account_list):
             if account["id"] in account_list:
                 relevant_account_info[account["id"]] = account["name"]
 
+    if len(account_list) != len(relevant_account_info):
+        filtered_ids = [id for id in account_list if id not in relevant_account_info]
+        pi_logger.error(
+            f"Skipping image operation for accounts with IDs not in any enterprise account groups. IDs: {filtered_ids}."
+        )
+        sys.exit(1)
     return relevant_account_info
 
 

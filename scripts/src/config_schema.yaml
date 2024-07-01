@@ -2,6 +2,7 @@ type: object
 properties:
   enterprise_id:
     type: string
+    minLength: 1
   account_group_id:
     type:
       - string
