@@ -60,6 +60,24 @@ def get_account_group_list(enterprise_id, iam_token):
         sys.exit(1)
 
 
+def get_account_details(account_id, iam_token):
+    req_url = f"https://enterprise.cloud.ibm.com/v1/accounts/{account_id}"
+    req_headers = {
+        "Authorization": f"Bearer {iam_token}",
+        "Content-Type": "application/json",
+    }
+    pi_logger.info(f"Start: Fetching details for account with ID {account_id} ...")
+    response, error = get_request(req_url, req_headers, None)
+    if response:
+        pi_logger.info(f"End: Fetched details for account with ID {account_id}.")
+        return response.json()
+    else:
+        pi_logger.error(
+            f"Error fetching the account information for account ID {account_id}. Invalid account ID for the API key provided: {error}"
+        )
+        sys.exit(1)
+
+
 def get_account_list(enterprise_id, account_group_id, iam_token):
     req_url = "https://enterprise.cloud.ibm.com/v1/accounts"
     req_headers = {

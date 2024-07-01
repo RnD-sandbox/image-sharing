@@ -71,3 +71,16 @@ def delete_boot_image(boot_image_id, workspace, bearer_token):
     }
     response, _err = delete_request(request_url, request_headers, None)
     return response, _err
+
+
+def get_image_status(workspace_details, bearer_token):
+    workspace_id = workspace_details["id"]
+    base_url = workspace_details["base_url"]
+    request_url = f"{base_url}/pcloud/v1/cloud-instances/{workspace_id}/cos-images"
+    request_headers = {
+        "Authorization": bearer_token,
+        "Content-Type": "application/json",
+        "CRN": workspace_details["crn"],
+    }
+    response, _err = get_request(request_url, request_headers)
+    return response, _err

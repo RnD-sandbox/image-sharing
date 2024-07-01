@@ -71,7 +71,7 @@ def get_relevant_account_group_id(account_groups, target_name):
     sys.exit(1)
 
 
-def create_account_identity_map(enterprise_id, access_token, account_list):
+def create_account_identity_map(access_token, account_list):
     """
     Creates an (id, name) map using the data from account groups  for the accounts mentioned in account_list
     Args:
@@ -79,27 +79,13 @@ def create_account_identity_map(enterprise_id, access_token, account_list):
         access_token: Access token created using the service id api key of the enterprise account
         account_list: The list of account from config.yaml
     Returns:
-        filtered_profiles: List of filtered trusted profiles.
+        account_identity_map: Map of account id and their names.
     """
-    # Fetch the list of account groups
-    account_groups = get_account_group_list(enterprise_id, access_token)
     relevant_account_info = {}
+    for account_id in account_list:
+        response = get_account_details(account_id, access_token)
+        relevant_account_info[account_id] = response["name"]
 
-    # get the name for the accounts mentioned in account_list
-    for account_group in account_groups:
-        relevant_accounts = get_account_list(
-            enterprise_id, account_group["id"], access_token
-        )
-        for account in relevant_accounts:
-            if account["id"] in account_list:
-                relevant_account_info[account["id"]] = account["name"]
-
-    if len(account_list) != len(relevant_account_info):
-        filtered_ids = [id for id in account_list if id not in relevant_account_info]
-        pi_logger.error(
-            f"Skipping image operation for accounts with IDs not in any enterprise account groups. IDs: {filtered_ids}."
-        )
-        sys.exit(1)
     return relevant_account_info
 
 
@@ -157,7 +143,6 @@ def deploy_image_to_account(account, enterprise_access_token):
     else:
         account_logger.log_other(
             account,
-            None,
             f"Failed to retrieve access token for account - {account['id']}",
         )
 
@@ -178,7 +163,6 @@ def import_image_to_workspaces(account, bearer_token):
     else:
         logger.log_other(
             account,
-            workspace,
             f"Failed to fetch the Power Virtual Server workspaces for {account['name']}. {_error}",
         )
     return logger
@@ -223,6 +207,7 @@ def delete_image_from_child_accounts(
             results = pool.starmap(delete_image_from_account, args)
             final_log = merge_image_op_logs(results)
             write_logs_to_file(final_log, log_operation_file_name)
+    return final_log
 
 
 def delete_image_from_account(account, enterprise_access_token):
@@ -243,7 +228,6 @@ def delete_image_from_account(account, enterprise_access_token):
     else:
         account_logger.log_other(
             account,
-            None,
             f"Failed to retrieve access token for account - {account['name']}",
         )
 
@@ -264,7 +248,6 @@ def delete_image_from_workspaces(account, bearer_token):
     else:
         logger.log_other(
             account,
-            workspace,
             f"Failed to fetch the Power Virtual Server workspaces for {account['name']}. {_error}",
         )
     return logger
@@ -383,22 +366,32 @@ def process_image(boot_image_name, boot_images):
         return None, False
 
 
-def fetch_status(
-    sleep_duration, filtered_trusted_profiles, access_token, log_file_name
-):
-    with open(log_file_name, "r") as file:
-        log_file = json.load(file)
-        if log_file["success"]:
-            pi_logger.info(
-                f"Initiating sleep for {sleep_duration} seconds before status check."
-            )
-            time.sleep(sleep_duration)
-            log_image_status_file_name = CONFIG.get("log_image_status_file_name")
-            get_image_import_status_from_accounts(
-                filtered_trusted_profiles, access_token, log_image_status_file_name
-            )
-        else:
-            pi_logger.info(f"No requests were found. Successful operation list empty.")
+def fetch_status(log_obj, sleep_duration):
+    enterprise_access_token = get_enterprise_bearer_token(os.getenv("IBMCLOUD_API_KEY"))
+
+    if log_obj and log_obj["success"]:
+        pi_logger.info(
+            f"Initiating sleep for {sleep_duration} seconds before status check."
+        )
+        time.sleep(sleep_duration)
+        count = 0
+        while count < 7:
+            for account in log_obj["success"]:
+                for workspace in account["workspaces"]:
+                    status_list = []
+                    response, _err = get_image_status(
+                        workspace, enterprise_access_token
+                    )
+                    if response:
+                        if response.json()["status"]["state"] != "completed":
+                            status_list.append(workspace)
+            if not status_list:
+                break
+            count = +1
+            pi_logger.info(f"INFO: Initiating sleep for 5 mins. ({count}/6 times)")
+            time.sleep(300)
+    else:
+        pi_logger.info(f"INFO: No active requests found.")
 
 
 def write_logs_to_file(logger, file_name):
