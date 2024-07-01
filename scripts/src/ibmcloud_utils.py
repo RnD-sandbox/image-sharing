@@ -18,6 +18,7 @@ from src.log_utils import *
 from src.constants import CONFIG
 
 pi_logger = logging.getLogger("logger")
+account_workspaces_map = {}
 
 
 def get_enterprise_bearer_token(api_key):
@@ -158,12 +159,13 @@ def import_image_to_workspaces(account, bearer_token):
     powervs_workspaces_response, _error = get_powervs_workspaces(bearer_token)
     if powervs_workspaces_response:
         power_workspaces = powervs_workspaces_response.json()["workspaces"]
+        account_workspaces_map[account["id"]] = power_workspaces
         for workspace in power_workspaces:
             import_image_to_workspace(workspace, bearer_token, logger)
     else:
         logger.log_other(
             account,
-            f"Failed to fetch the Power Virtual Server workspaces for {account['name']}. {_error}",
+            f"Failed to fetch the Power Virtual Server workspaces for {account["name"]}. {_error}",
         )
     return logger
 
@@ -182,8 +184,15 @@ def import_image_to_workspace(workspace, bearer_token, logger):
             CONFIG.get("image_details")["image_name"],
             boot_images_response.json()["images"],
         )
-        if image_found and is_active:
-            logger.log_skipped(workspace)
+        active_job = get_image_status({ "name": workspace["name"],
+                "id": workspace["id"],
+                "crn": workspace["details"]["crn"],
+                "base_url": workspace["location"]["url"]}, bearer_token)
+            
+        if (image_found and is_active):
+            logger.c(workspace, "Image with the same name exists in this workspace.")
+        elif active_job.json()["status"]["state"] == "running":
+            logger.log_skipped(workspace, "Another import job already running.")
         else:
             response, _error = import_boot_image(workspace, bearer_token)
             if response:
@@ -276,7 +285,7 @@ def delete_image_from_workspace(workspace, account, bearer_token, logger):
             else:
                 logger.log_failure(workspace, _error)
         else:
-            logger.log_skipped(workspace)
+            logger.log_skipped(workspace, "The image does not exist.")
 
 
 def get_image_import_status_from_accounts(

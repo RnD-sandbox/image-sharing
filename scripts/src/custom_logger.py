@@ -19,13 +19,14 @@ class ImageShareLogger:
             }
         )
 
-    def log_skipped(self, workspace):
+    def log_skipped(self, workspace, message):
         self.skipped_list.append(
             {
                 "name": workspace["name"],
                 "id": workspace["id"],
                 "crn": workspace["details"]["crn"],
                 "base_url": workspace["location"]["url"],
+                "message": message,
             }
         )
 
