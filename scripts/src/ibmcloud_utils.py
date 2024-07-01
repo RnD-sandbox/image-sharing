@@ -121,9 +121,12 @@ def deploy_image_to_child_accounts(account_list, enterprise_access_token, log_fi
         args = [(account, enterprise_access_token) for account in account_list]
         with multiprocessing.Pool(processes=5) as pool:
             results = pool.starmap(deploy_image_to_account, args)
-            final_log = merge_image_op_logs(results)
-            write_logs_to_file(final_log, log_file)
-    return final_log
+        final_log = merge_image_op_logs(results)
+        write_logs_to_file(final_log, log_file)
+        fetch_status(final_log, 600)
+        if final_log is not None and final_log["failed"]:
+            pi_logger.error(f"Import image failed for following accounts '{final_log['failed']}'.")
+            sys.exit(1)
 
 
 def deploy_image_to_account(account, enterprise_access_token):
@@ -222,9 +225,13 @@ def delete_image_from_child_accounts(account_list, enterprise_access_token, log_
     args = [(account, enterprise_access_token) for account in account_list]
     with multiprocessing.Pool(processes=5) as pool:
         results = pool.starmap(delete_image_from_account, args)
-        final_log = merge_image_op_logs(results)
-        write_logs_to_file(final_log, log_operation_file_name)
-    return final_log
+    final_log = merge_image_op_logs(results)
+    write_logs_to_file(final_log, log_operation_file_name)
+    fetch_status(final_log, 180)
+    if final_log is not None and final_log["failed"]:
+        pi_logger.error(f"Delete image failed for following accounts '{final_log['failed']}'.")
+        sys.exit(1)
+
 
 
 def delete_image_from_account(account, enterprise_access_token):
@@ -243,7 +250,7 @@ def delete_image_from_account(account, enterprise_access_token):
         workspace_logger = delete_image_from_workspaces(account, bearer_token)
         return log_account_level_image_op(account_logger, workspace_logger, account)
     else:
-        account_logger.log_other(account, f"Failed to retrieve access token for account - {account['name']}")
+        account_logger.log_other(account, f"Failed to retrieve access token for account - {account['name']} , error : {_error}")
 
 
 def delete_image_from_workspaces(account, bearer_token):

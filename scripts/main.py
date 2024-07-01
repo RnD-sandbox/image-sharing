@@ -44,6 +44,7 @@ if __name__ == "__main__":
         log_operation_file_name = CONFIG.get("log_operation_file_name")
         log_image_status_file_name = CONFIG.get("log_image_status_file_name")
         pi_logger.info(f"Initiating provided PowerVS boot image {image_operation} operation.")
+        
         if image_operation == "IMPORT":
             # Check if cos credentials and image exists in bucket
             object_exists_in_ibm_cos(
@@ -54,27 +55,14 @@ if __name__ == "__main__":
                 CONFIG.get("cos_bucket_details")["cos_image_file_name"],
             )
             # Import the image
-            result = deploy_image_to_child_accounts(filtered_trusted_profiles, enterprise_access_token, log_operation_file_name)
-
-            fetch_status(result, 600)
-            if result is not None and result["failed"]:
-                pi_logger.error(f"Import image failed for following accounts '{result['failed']}'.")
-                sys.exit(1)
+            deploy_image_to_child_accounts(filtered_trusted_profiles, enterprise_access_token, log_operation_file_name)
 
         elif image_operation == "DELETE":
             # Delete the image
-            result = delete_image_from_child_accounts(filtered_trusted_profiles, enterprise_access_token, log_operation_file_name)
-            fetch_status(result, 180)
-            if result is not None and result["failed"]:
-                pi_logger.error(f"Delete image failed for following accounts '{result['failed']}'.")
-                sys.exit(1)
+            delete_image_from_child_accounts(filtered_trusted_profiles, enterprise_access_token, log_operation_file_name)
 
         elif image_operation == "STATUS":
-            get_image_import_status_from_accounts(
-                filtered_trusted_profiles,
-                enterprise_access_token,
-                log_image_status_file_name,
-            )
+            get_image_import_status_from_accounts(filtered_trusted_profiles, enterprise_access_token, log_image_status_file_name)
         else:
             pi_logger.error(f"Unidentified action '{image_operation}' passed. Supported operations are IMPORT and DELETE.")
             sys.exit(1)
