@@ -71,7 +71,7 @@ def get_relevant_account_group_id(account_groups, target_name):
     sys.exit(1)
 
 
-def create_account_identity_map(enterprise_id, access_token, account_list):
+def create_account_identity_map(access_token, account_list):
     """
     Creates an (id, name) map using the data from account groups  for the accounts mentioned in account_list
     Args:
@@ -79,27 +79,13 @@ def create_account_identity_map(enterprise_id, access_token, account_list):
         access_token: Access token created using the service id api key of the enterprise account
         account_list: The list of account from config.yaml
     Returns:
-        filtered_profiles: List of filtered trusted profiles.
+        account_identity_map: Map of account id and their names.
     """
-    # Fetch the list of account groups
-    account_groups = get_account_group_list(enterprise_id, access_token)
     relevant_account_info = {}
+    for account_id in account_list:
+        response = get_account_details(account_id, access_token)
+        relevant_account_info[account_id] = response["name"]
 
-    # get the name for the accounts mentioned in account_list
-    for account_group in account_groups:
-        relevant_accounts = get_account_list(
-            enterprise_id, account_group["id"], access_token
-        )
-        for account in relevant_accounts:
-            if account["id"] in account_list:
-                relevant_account_info[account["id"]] = account["name"]
-
-    if len(account_list) != len(relevant_account_info):
-        filtered_ids = [id for id in account_list if id not in relevant_account_info]
-        pi_logger.error(
-            f"ERROR: Skipping image operation for accounts with IDs not in any enterprise account groups. IDs: {filtered_ids}."
-        )
-        sys.exit(1)
     return relevant_account_info
 
 
