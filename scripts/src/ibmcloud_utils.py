@@ -97,7 +97,7 @@ def create_account_identity_map(enterprise_id, access_token, account_list):
     if len(account_list) != len(relevant_account_info):
         filtered_ids = [id for id in account_list if id not in relevant_account_info]
         pi_logger.error(
-            f"Skipping image operation for accounts with IDs not in any enterprise account groups. IDs: {filtered_ids}."
+            f"ERROR: Skipping image operation for accounts with IDs not in any enterprise account groups. IDs: {filtered_ids}."
         )
         sys.exit(1)
     return relevant_account_info
