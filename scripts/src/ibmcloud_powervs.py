@@ -46,9 +46,11 @@ def import_boot_image(workspace, bearer_token):
         "accessKey": os.getenv("COS_ACCESS_KEY"),
         "secretKey": os.getenv("COS_SECRET_KEY"),
         "storageType": "tier3",
-        "licenseType": CONFIG.get("image_details")["license_type"],
-        "product": CONFIG.get("image_details")["product"],
-        "vendor": CONFIG.get("image_details")["vendor"],
+        "importDetails": {
+            "licenseType": CONFIG.get("image_details")["license_type"],
+            "product": CONFIG.get("image_details")["product"],
+            "vendor": CONFIG.get("image_details")["vendor"],
+        },
     }
     response, _err = post_request(
         request_url, request_headers, json.dumps(request_data)

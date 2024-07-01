@@ -21,7 +21,7 @@ image_details:
   image_name: "RHEL-9-2-Suraj"
   license_type: "byol"
   product: "Hana"
-  vendor: "sap"
+  vendor: "SAP"
 
 # Cloud Object Storage bucket name, region and file name.
 cos_bucket_details:
