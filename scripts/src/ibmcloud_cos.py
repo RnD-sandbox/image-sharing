@@ -17,22 +17,16 @@ def object_exists_in_ibm_cos(access_key, secret_key, region, bucket, object_key)
         aws_secret_access_key=secret_key,
         endpoint_url=endpoint_url,
     )
-    pi_logger.info(
-        f"Start: Checking if s3 credentials are correct and object exists in bucket. Sending requestURL = {request_url}"
-    )
+    pi_logger.info(f"Start: Checking if s3 credentials are correct and object exists in bucket. Sending requestURL = {request_url}")
 
     try:
         # Attempt to retrieve metadata for the object
         s3.head_object(Bucket=bucket, Key=object_key)
-        pi_logger.info(
-            f"End: Checked s3 credentials are correct and object exists in bucket."
-        )
+        pi_logger.info(f"End: Checked s3 credentials are correct and object exists in bucket.")
     except ClientError as e:
         error_code = e.response["Error"]["Code"]
         if error_code == "404":
-            pi_logger.error(
-                f"Object '{object_key}' does not exist in bucket '{bucket}'. Status code: 404"
-            )
+            pi_logger.error(f"Object '{object_key}' does not exist in bucket '{bucket}'. Status code: 404")
             sys.exit(1)
         else:
             pi_logger.error(

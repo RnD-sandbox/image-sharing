@@ -1,6 +1,4 @@
-import os
 import sys
-
 from src.api_requests import get_request, post_request
 from src.log_utils import *
 
@@ -36,30 +34,6 @@ def get_trusted_profiles(access_token):
         sys.exit(1)
 
 
-def get_account_group_list(enterprise_id, iam_token):
-    req_url = "https://enterprise.cloud.ibm.com/v1/account-groups"
-    req_headers = {
-        "Authorization": f"Bearer {iam_token}",
-        "Content-Type": "application/json",
-    }
-    req_params = {"enterprise_id": enterprise_id, "include_deleted": "false"}
-    pi_logger.info(
-        f"Start: Fetching account groups in Enterprise account with ID {enterprise_id} ..."
-    )
-    response, error = get_request(req_url, req_headers, req_params)
-
-    if response:
-        pi_logger.info(
-            f"End: Fetched account groups in Enterprise account with ID {enterprise_id}"
-        )
-        return response.json()["resources"]
-    else:
-        pi_logger.error(
-            f"Error fetching the account groups for account ID {enterprise_id}. Invalid Enterprise account ID for the API key provided: {error}"
-        )
-        sys.exit(1)
-
-
 def get_account_details(account_id, iam_token):
     req_url = f"https://enterprise.cloud.ibm.com/v1/accounts/{account_id}"
     req_headers = {
@@ -72,9 +46,7 @@ def get_account_details(account_id, iam_token):
         pi_logger.info(f"End: Fetched details for account with ID {account_id}.")
         return response.json()
     else:
-        pi_logger.error(
-            f"Error fetching the account information for account ID {account_id}. Invalid account ID for the API key provided: {error}"
-        )
+        pi_logger.error(f"Error fetching the account information for account ID {account_id}. Invalid account ID for the API key provided: {error}")
         sys.exit(1)
 
 
@@ -90,19 +62,13 @@ def get_account_list(enterprise_id, account_group_id, iam_token):
         "include_deleted": "false",
     }
 
-    pi_logger.info(
-        f"Start: Fetching list of accounts under the account group id {account_group_id} ..."
-    )
+    pi_logger.info(f"Start: Fetching list of accounts under the account group id {account_group_id} ...")
     response, error = get_request(req_url, req_headers, req_params)
     if response:
-        pi_logger.info(
-            f"End: Fetched list of accounts under the account group id {account_group_id} ..."
-        )
+        pi_logger.info(f"End: Fetched list of accounts under the account group id {account_group_id} ...")
         return response.json()["resources"]
     else:
-        pi_logger.error(
-            f"Error fetching list of accounts under the account group id {account_group_id}: {error}"
-        )
+        pi_logger.error(f"Error fetching list of accounts under the account group id {account_group_id}: {error}")
         sys.exit(1)
 
 

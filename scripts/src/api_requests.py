@@ -9,9 +9,7 @@ def get_request(url, headers=None, params=None):
     try:
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
-        pi_logger.info(
-            f"GET request to {url} successful. Status code: {response.status_code}"
-        )
+        pi_logger.info(f"GET request to {url} successful. Status code: {response.status_code}")
         return response, None
     except HTTPError as http_err:
         return None, f"HTTP error occurred: {http_err}"
@@ -24,9 +22,7 @@ def post_request(url, headers=None, data=None):
     try:
         response = requests.post(url, headers=headers, data=data)
         response.raise_for_status()
-        pi_logger.info(
-            f"POST request to {url} successful. Status code: {response.status_code}"
-        )
+        pi_logger.info(f"POST request to {url} successful. Status code: {response.status_code}")
         return response, None
     except HTTPError as http_err:
         return None, f"HTTP error occurred: {http_err}"
@@ -39,9 +35,7 @@ def delete_request(url, headers=None, data=None):
     try:
         response = requests.delete(url, headers=headers, data=data)
         response.raise_for_status()
-        pi_logger.info(
-            f"DELETE request to {url} successful. Status code: {response.status_code}"
-        )
+        pi_logger.info(f"DELETE request to {url} successful. Status code: {response.status_code}")
         return response, None
     except HTTPError as http_err:
         return None, f"HTTP error occurred: {http_err}"

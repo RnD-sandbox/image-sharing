@@ -28,9 +28,7 @@ def validate_config():
     valid_vendors = ["SAP"]
 
     # Check if all variables are not null or empty or all are null or empty
-    if (licenseType and product and vendor) or (
-        not licenseType and not product and not vendor
-    ):
+    if (licenseType and product and vendor) or (not licenseType and not product and not vendor):
         # Check if the values are valid
         if (
             (licenseType in valid_licenseTypes or not licenseType)
@@ -41,18 +39,16 @@ def validate_config():
                 valid_licenseType = licenseType
                 valid_product = product
                 valid_vendor = vendor
-                pi_logger.info(
-                    f"License Type: {valid_licenseType}, Product: {valid_product}, Vendor: {valid_vendor}"
-                )
+                pi_logger.info(f"License Type: {valid_licenseType}, Product: {valid_product}, Vendor: {valid_vendor}")
             else:
                 valid_licenseType = valid_product = valid_vendor = None
                 pi_logger.info("LicenseType, product and vendor are null or empty.")
         else:
-            pi_logger.error("ERROR: LicenseType, product and vendor has invalid values. Supported values are license_type:byol, product:Hana,Netweaver, vendor:SAP")
+            pi_logger.error(
+                "ERROR: LicenseType, product and vendor has invalid values. Supported values are license_type:byol, product:Hana,Netweaver, vendor:SAP"
+            )
             sys.exit(1)
     else:
-        pi_logger.error(
-            "Warning: All three attributes LicenseType, product and vendor must be set together or be null/empty together."
-        )
+        pi_logger.error("Warning: All three attributes LicenseType, product and vendor must be set together or be null/empty together.")
         sys.exit(1)
     pi_logger.info("End: Validation successful for config.yaml")
