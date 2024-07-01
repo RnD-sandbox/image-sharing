@@ -143,7 +143,6 @@ def deploy_image_to_account(account, enterprise_access_token):
     else:
         account_logger.log_other(
             account,
-            None,
             f"Failed to retrieve access token for account - {account['id']}",
         )
 
@@ -164,7 +163,6 @@ def import_image_to_workspaces(account, bearer_token):
     else:
         logger.log_other(
             account,
-            workspace,
             f"Failed to fetch the Power Virtual Server workspaces for {account['name']}. {_error}",
         )
     return logger
@@ -209,6 +207,7 @@ def delete_image_from_child_accounts(
             results = pool.starmap(delete_image_from_account, args)
             final_log = merge_image_op_logs(results)
             write_logs_to_file(final_log, log_operation_file_name)
+    return final_log
 
 
 def delete_image_from_account(account, enterprise_access_token):
@@ -229,7 +228,6 @@ def delete_image_from_account(account, enterprise_access_token):
     else:
         account_logger.log_other(
             account,
-            None,
             f"Failed to retrieve access token for account - {account['name']}",
         )
 
@@ -250,7 +248,6 @@ def delete_image_from_workspaces(account, bearer_token):
     else:
         logger.log_other(
             account,
-            workspace,
             f"Failed to fetch the Power Virtual Server workspaces for {account['name']}. {_error}",
         )
     return logger
@@ -369,22 +366,32 @@ def process_image(boot_image_name, boot_images):
         return None, False
 
 
-def fetch_status(
-    sleep_duration, filtered_trusted_profiles, access_token, log_file_name
-):
-    with open(log_file_name, "r") as file:
-        log_file = json.load(file)
-        if log_file["success"]:
-            pi_logger.info(
-                f"Initiating sleep for {sleep_duration} seconds before status check."
-            )
-            time.sleep(sleep_duration)
-            log_image_status_file_name = CONFIG.get("log_image_status_file_name")
-            get_image_import_status_from_accounts(
-                filtered_trusted_profiles, access_token, log_image_status_file_name
-            )
-        else:
-            pi_logger.info(f"No requests were found. Successful operation list empty.")
+def fetch_status(log_obj, sleep_duration):
+    enterprise_access_token = get_enterprise_bearer_token(os.getenv("IBMCLOUD_API_KEY"))
+
+    if log_obj and log_obj["success"]:
+        pi_logger.info(
+            f"Initiating sleep for {sleep_duration} seconds before status check."
+        )
+        time.sleep(sleep_duration)
+        count = 0
+        while count < 7:
+            for account in log_obj["success"]:
+                for workspace in account["workspaces"]:
+                    status_list = []
+                    response, _err = get_image_status(
+                        workspace, enterprise_access_token
+                    )
+                    if response:
+                        if response.json()["status"]["state"] != "completed":
+                            status_list.append(workspace)
+            if not status_list:
+                break
+            count = +1
+            pi_logger.info(f"INFO: Initiating sleep for 5 mins. ({count}/6 times)")
+            time.sleep(300)
+    else:
+        pi_logger.info(f"INFO: No active requests found.")
 
 
 def write_logs_to_file(logger, file_name):

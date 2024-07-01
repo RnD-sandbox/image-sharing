@@ -71,12 +71,8 @@ if __name__ == "__main__":
                 enterprise_access_token,
                 log_operation_file_name,
             )
-            fetch_status(
-                1800,
-                filtered_trusted_profiles,
-                enterprise_access_token,
-                log_operation_file_name,
-            )
+
+            fetch_status(result, 600)
             if result is not None and result["failed"]:
                 pi_logger.error(
                     f"Import image failed for following accounts '{result['failed']}'."
@@ -90,12 +86,7 @@ if __name__ == "__main__":
                 enterprise_access_token,
                 log_operation_file_name,
             )
-            fetch_status(
-                180,
-                filtered_trusted_profiles,
-                enterprise_access_token,
-                log_operation_file_name,
-            )
+            fetch_status(result, 180)
             if result is not None and result["failed"]:
                 pi_logger.error(
                     f"Delete image failed for following accounts '{result['failed']}'."

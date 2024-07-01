@@ -10,25 +10,41 @@ class ImageShareLogger:
         self.other = []
 
     def log_success(self, workspace):
-        self.success_list.append({"id": workspace["id"], "name": workspace["name"]})
+        self.success_list.append(
+            {
+                "name": workspace["name"],
+                "id": workspace["id"],
+                "crn": workspace["details"]["crn"],
+                "base_url": workspace["location"]["url"],
+            }
+        )
 
     def log_skipped(self, workspace):
-        self.skipped_list.append({"id": workspace["id"], "name": workspace["name"]})
+        self.skipped_list.append(
+            {
+                "name": workspace["name"],
+                "id": workspace["id"],
+                "crn": workspace["details"]["crn"],
+                "base_url": workspace["location"]["url"],
+            }
+        )
 
     def log_failure(self, workspace, error):
         self.failed_list.append(
-            {"id": workspace["id"], "name": workspace["name"], "error": error}
+            {
+                "name": workspace["name"],
+                "id": workspace["id"],
+                "crn": workspace["details"]["crn"],
+                "base_url": workspace["location"]["url"],
+            }
         )
 
-    def log_other(self, account, workspace, error):
+    def log_other(self, account, error):
         log = {
             "account_id": account["account_id"],
             "account_name": account["name"],
             "error": error,
         }
-        if workspace != None:
-            log["workspace_id"] = workspace["id"]
-            log["workspace_name"] = workspace["name"]
         self.other.append(log)
 
     def get_log(self):
