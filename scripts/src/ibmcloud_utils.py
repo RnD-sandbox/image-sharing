@@ -165,7 +165,7 @@ def import_image_to_workspaces(account, bearer_token):
     else:
         logger.log_other(
             account,
-            f"Failed to fetch the Power Virtual Server workspaces for {account['name']}. {_error}",
+            f"Failed to fetch the Power Virtual Server workspaces for {account}, {_error}",
         )
     return logger
 
