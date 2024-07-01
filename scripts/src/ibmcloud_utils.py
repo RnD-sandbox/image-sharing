@@ -180,18 +180,28 @@ def import_image_to_workspace(workspace, bearer_token, logger):
     """
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
     if boot_images_response:
+        # check if the image already exists
         image_found, is_active = process_image(
             CONFIG.get("image_details")["image_name"],
             boot_images_response.json()["images"],
         )
-        active_job = get_image_status({ "name": workspace["name"],
+        # check if there is already an image import job running
+        latest_job_status = get_image_status(
+            {
+                "name": workspace["name"],
                 "id": workspace["id"],
                 "crn": workspace["details"]["crn"],
-                "base_url": workspace["location"]["url"]}, bearer_token)
-            
-        if (image_found and is_active):
+                "base_url": workspace["location"]["url"],
+            },
+            bearer_token,
+        )
+
+        if image_found and is_active:
             logger.c(workspace, "Image with the same name exists in this workspace.")
-        elif active_job.json()["status"]["state"] == "running":
+        elif (
+            latest_job_status
+            and latest_job_status.json()["status"]["state"] == "running"
+        ):
             logger.log_skipped(workspace, "Another import job already running.")
         else:
             response, _error = import_boot_image(workspace, bearer_token)
@@ -377,6 +387,7 @@ def fetch_status(log_obj, sleep_duration):
             f"Initiating sleep for {sleep_duration} seconds before status check."
         )
         time.sleep(sleep_duration)
+        pi_logger.info(f"Initiating status checks ...")
         count = 0
         while count < 7:
             for account in log_obj["success"]:
@@ -389,6 +400,7 @@ def fetch_status(log_obj, sleep_duration):
                         if response.json()["status"]["state"] != "completed":
                             status_list.append(workspace)
             if not status_list:
+                pi_logger.info(f"INFO: Status check completed.")
                 break
             count = +1
             pi_logger.info(f"INFO: Initiating sleep for 5 mins. ({count}/6 times)")
