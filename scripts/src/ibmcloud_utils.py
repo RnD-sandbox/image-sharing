@@ -201,21 +201,19 @@ def import_image_to_workspace(workspace, bearer_token, logger):
                 logger.log_failure(workspace, _error)
 
 
-def delete_image_from_child_accounts(
-    account_list, enterprise_access_token, log_operation_file_name
-):
+def delete_image_from_child_accounts(account_list, enterprise_access_token, log_operation_file_name):
     """
     Deletes image from child accounts using multiprocessing.
 
     :param account_list: List of account dictionaries containing account details.
     :param enterprise_access_token: Enterprise access token.
     """
-    if account_list:
-        args = [(account, enterprise_access_token) for account in account_list]
-        with multiprocessing.Pool(processes=5) as pool:
-            results = pool.starmap(delete_image_from_account, args)
-            final_log = merge_image_op_logs(results)
-            write_logs_to_file(final_log, log_operation_file_name)
+
+    args = [(account, enterprise_access_token) for account in account_list]
+    with multiprocessing.Pool(processes=5) as pool:
+        results = pool.starmap(delete_image_from_account, args)
+        final_log = merge_image_op_logs(results)
+        write_logs_to_file(final_log, log_operation_file_name)
     return final_log
 
 
@@ -235,10 +233,7 @@ def delete_image_from_account(account, enterprise_access_token):
         workspace_logger = delete_image_from_workspaces(account, bearer_token)
         return log_account_level_image_op(account_logger, workspace_logger, account)
     else:
-        account_logger.log_other(
-            account,
-            f"Failed to retrieve access token for account - {account['name']}",
-        )
+        account_logger.log_other(account, f"Failed to retrieve access token for account - {account['name']}")
 
 
 def delete_image_from_workspaces(account, bearer_token):
@@ -253,7 +248,7 @@ def delete_image_from_workspaces(account, bearer_token):
     if powervs_workspaces_response:
         power_workspaces = powervs_workspaces_response.json()["workspaces"]
         for workspace in power_workspaces:
-            delete_image_from_workspace(workspace, account, bearer_token, logger)
+            delete_image_from_workspace(workspace, bearer_token, logger)
     else:
         logger.log_other(
             account,
@@ -262,12 +257,11 @@ def delete_image_from_workspaces(account, bearer_token):
     return logger
 
 
-def delete_image_from_workspace(workspace, account, bearer_token, logger):
+def delete_image_from_workspace(workspace, bearer_token, logger):
     """
     Deletes image from a single workspace.
 
     :param workspace: Dictionary containing workspace details.
-    :param account: Dictionary containing account details.
     :param bearer_token: Bearer token for the account.
     """
     boot_images_response, _error = get_boot_images(workspace, bearer_token)

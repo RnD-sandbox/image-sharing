@@ -63,11 +63,7 @@ if __name__ == "__main__":
 
         elif image_operation == "DELETE":
             # Delete the image
-            result = delete_image_from_child_accounts(
-                filtered_trusted_profiles,
-                enterprise_access_token,
-                log_operation_file_name,
-            )
+            result = delete_image_from_child_accounts(filtered_trusted_profiles, enterprise_access_token, log_operation_file_name)
             fetch_status(result, 180)
             if result is not None and result["failed"]:
                 pi_logger.error(f"Delete image failed for following accounts '{result['failed']}'.")
