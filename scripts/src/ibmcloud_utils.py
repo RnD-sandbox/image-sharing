@@ -87,8 +87,8 @@ def image_ops_on_child_accounts(action, account_list, enterprise_access_token, l
         log_file: Filename to store logs.
     """
     operation = {
-        "delete": {"message": "Delete image failed for following accounts", "sleep": 180},
-        "import": {"message": "Import image failed for following accounts", "sleep": 600},
+        "delete": {"err_message": "Delete image failed for following accounts", "sleep": 180},
+        "import": {"err_message": "Import image failed for following accounts", "sleep": 600},
     }
 
     if account_list:
@@ -100,7 +100,7 @@ def image_ops_on_child_accounts(action, account_list, enterprise_access_token, l
         write_logs_to_file(final_log, log_file)
         fetch_status(final_log, operation[action]["sleep"])
         if final_log is not None and final_log["failed"]:
-            pi_logger.error(f"{operation[action]['message']} '{final_log['failed']}'.")
+            pi_logger.error(f"{operation[action]['err_message']} '{final_log['failed']}'.")
             sys.exit(1)
 
 

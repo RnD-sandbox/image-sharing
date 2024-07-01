@@ -42,7 +42,6 @@ if __name__ == "__main__":
     if filtered_trusted_profiles:
         image_operation = CONFIG.get("image_operation")
         log_operation_file_name = CONFIG.get("log_operation_file_name")
-        log_image_status_file_name = CONFIG.get("log_image_status_file_name")
         pi_logger.info(f"Initiating provided PowerVS boot image {image_operation} operation.")
 
         if image_operation == "IMPORT":
