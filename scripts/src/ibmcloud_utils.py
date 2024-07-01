@@ -18,7 +18,6 @@ from src.log_utils import *
 from src.constants import CONFIG
 
 pi_logger = logging.getLogger("logger")
-account_workspaces_map = {}
 
 
 def get_enterprise_bearer_token(api_key):
@@ -162,7 +161,6 @@ def import_image_to_workspaces(account, bearer_token):
     powervs_workspaces_response, _error = get_powervs_workspaces(bearer_token)
     if powervs_workspaces_response:
         power_workspaces = powervs_workspaces_response.json()["workspaces"]
-        account_workspaces_map[account["id"]] = power_workspaces
         for workspace in power_workspaces:
             import_image_to_workspace(workspace, bearer_token, logger)
     else:
@@ -189,7 +187,7 @@ def import_image_to_workspace(workspace, bearer_token, logger):
             boot_images_response.json()["images"],
         )
         # check if there is already an image import job running
-        latest_job_status = get_image_status(
+        latest_job_status, _error = get_image_status(
             {
                 "name": workspace["name"],
                 "id": workspace["id"],
@@ -200,11 +198,8 @@ def import_image_to_workspace(workspace, bearer_token, logger):
         )
 
         if image_found and is_active:
-            logger.c(workspace, "Image with the same name exists in this workspace.")
-        elif (
-            latest_job_status
-            and latest_job_status.json()["status"]["state"] == "running"
-        ):
+            logger.skipped_list(workspace, "Image with the same name exists in this workspace.")
+        elif latest_job_status and latest_job_status.json()["status"]["state"] == "running":
             logger.log_skipped(workspace, "Another import job already running.")
         else:
             response, _error = import_boot_image(workspace, bearer_token)
