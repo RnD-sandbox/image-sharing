@@ -218,7 +218,6 @@ def image_ops_on_workspace(action, workspace, bearer_token, logger):
             logger.log_skipped(workspace, "The image does not exist.")
 
     elif action == "status":
-
         response, _err = get_cos_image_import_status(workspace_details, bearer_token)
         if response:
             if response.json()["status"]["state"] != "completed":
