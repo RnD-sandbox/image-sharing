@@ -83,11 +83,12 @@ def image_ops_on_child_accounts(action, account_list, enterprise_access_token, o
         ops_log_file: Filename to store logs.
     """
     operation = {
-        "delete": {"err_message": "ERROR: Delete image failed for following accounts", "sleep": 180},
-        "import": {"err_message": "ERROR: Import image failed for following accounts", "sleep": 600},
+        "delete": {"err_message": "ERROR: Delete image failed for following accounts", "sleep": 180, "status": "status-delete"},
+        "import": {"err_message": "ERROR: Import image failed for following accounts", "sleep": 600, "status": "status-import"},
     }
 
     if account_list:
+        # Perform Delete/Import operation
         args = [(action, account, enterprise_access_token) for account in account_list]
         with multiprocessing.Pool(processes=CONFIG.get("processes")) as pool:
             results = pool.starmap(image_ops_on_child_account, args)
@@ -95,27 +96,34 @@ def image_ops_on_child_accounts(action, account_list, enterprise_access_token, o
         image_ops_log = merge_image_op_logs(results)
         write_logs_to_file(image_ops_log, ops_log_file)
 
+        # Perform Image Operation status checks
         if image_ops_log and image_ops_log["success"]:
             pi_logger.info(f"Initiating sleep for {operation[action]['sleep']} seconds before status check.")
             time.sleep(operation[action]["sleep"])
             pi_logger.info(f"Initiating status checks ...")
             count = 0
+            args = [(operation[action]["status"], account, enterprise_access_token) for account in account_list]
+
+            # Check status every 5 mins with 6 retires
             while count < 7:
                 with multiprocessing.Pool(processes=CONFIG.get("processes")) as pool:
-                    status_results = pool.starmap(
-                        image_ops_on_child_account, [("status", account, enterprise_access_token) for account in account_list]
-                    )
-                    image_ops_status_log = merge_image_op_logs(status_results)
+                    status_results = pool.starmap(image_ops_on_child_account, args)
+                image_ops_status_log = merge_image_op_logs(status_results)
+
                 if not image_ops_status_log["failed"]:
                     pi_logger.info(f"INFO: Status Check Completed.")
                     pi_logger.info(f"INFO: Log file written to {CONFIG.get('log_operation_file_name')}.")
                     break
+
                 count += 1
                 pi_logger.info(f"INFO: Initiating sleep for 5 mins. Retrying {count} of 6 times....")
                 time.sleep(300)
+
             if image_ops_status_log is not None and image_ops_status_log["failed"]:
                 pi_logger.error(f"{operation[action]['err_message']} '{image_ops_status_log['failed']}'.")
+
             write_logs_to_file(image_ops_status_log, ops_status_log_file)
+
         else:
             pi_logger.info(f"No active request/changes done.")
 
@@ -220,7 +228,8 @@ def image_ops_on_workspace(action, workspace, bearer_token, logger):
         else:
             logger.log_skipped(workspace, "The image does not exist.")
 
-    elif action == "status":
+    elif action == "status-import":
+        # Check status of image import job running in a workspace
         response, _err = get_cos_image_import_status(workspace_details, bearer_token)
         if response:
             if response.json()["status"]["state"] != "completed":
@@ -231,6 +240,16 @@ def image_ops_on_workspace(action, workspace, bearer_token, logger):
                 logger.log_success(workspace)
         else:
             pi_logger.error(f"Error fetching status: {_err}")
+
+    elif action == "status-delete":
+        # Check image status in a workspace
+        if image_found and is_active:
+            pi_logger.error(f"Status: Image Operation not completed for workspace: {workspace_details}")
+            logger.log_failure(workspace, _error)
+        else:
+            pi_logger.info(f"Status: Image Operation completed for workspace: {workspace_details}")
+            logger.log_success(workspace)
+
     else:
         logger.log_failure(workspace, "Invalid operation specified.")
 
