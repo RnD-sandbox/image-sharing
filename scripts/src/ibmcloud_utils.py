@@ -1,16 +1,12 @@
 import json
 import multiprocessing
-import os
 import sys
 import time
 
 from src.custom_logger import (
     ImageShareLogger,
-    ImageStatusLogger,
     log_account_level_image_op,
-    log_account_level_status,
     merge_image_op_logs,
-    merge_status_logs,
 )
 from src.ibmcloud_iam import *
 from src.ibmcloud_powervs import *
@@ -87,8 +83,8 @@ def image_ops_on_child_accounts(action, account_list, enterprise_access_token, l
         log_file: Filename to store logs.
     """
     operation = {
-        "delete": {"err_message": "Delete image failed for following accounts", "sleep": 180},
-        "import": {"err_message": "Import image failed for following accounts", "sleep": 600},
+        "delete": {"err_message": "ERROR: Delete image failed for following accounts", "sleep": 180},
+        "import": {"err_message": "ERROR: Import image failed for following accounts", "sleep": 600},
     }
 
     if account_list:
@@ -98,7 +94,28 @@ def image_ops_on_child_accounts(action, account_list, enterprise_access_token, l
 
         final_log = merge_image_op_logs(results)
         write_logs_to_file(final_log, log_file)
-        fetch_status(final_log, operation[action]["sleep"])
+
+        if final_log and final_log["success"]:
+            pi_logger.info(f"Initiating sleep for {operation[action]['sleep']} seconds before status check.")
+            time.sleep(operation[action]["sleep"])
+            pi_logger.info(f"Initiating status checks ...")
+            count = 0
+            while count < 7:
+                with multiprocessing.Pool(processes=5) as pool:
+                    status_results = pool.starmap(
+                        image_ops_on_child_account, [("status", account, enterprise_access_token) for account in account_list]
+                    )
+                    status_log = merge_image_op_logs(status_results)
+                if not status_log["failed"]:
+                    pi_logger.info(f"INFO: Status Check Completed.")
+                    pi_logger.info(f"INFO: Log file written to {CONFIG.get('log_operation_file_name')}.")
+                    break
+                count = +1
+                pi_logger.info(f"INFO: Initiating sleep for 5 mins. {count} of 6 times")
+                time.sleep(300)
+            if status_log is not None and status_log["failed"]:
+                pi_logger.error(f"{operation[action]['err_message']} '{status_log['failed']}'.")
+
         if final_log is not None and final_log["failed"]:
             pi_logger.error(f"{operation[action]['err_message']} '{final_log['failed']}'.")
             sys.exit(1)
@@ -158,6 +175,13 @@ def image_ops_on_workspace(action, workspace, bearer_token, logger):
         logger: Logger object for logging operations.
         operation: String specifying the operation ('import' or 'delete').
     """
+    workspace_details = {
+        "name": workspace["name"],
+        "id": workspace["id"],
+        "crn": workspace["details"]["crn"],
+        "base_url": workspace["location"]["url"],
+    }
+
     boot_images_response, _error = get_boot_images(workspace, bearer_token)
     if not boot_images_response:
         logger.log_failure(workspace, _error)
@@ -168,15 +192,7 @@ def image_ops_on_workspace(action, workspace, bearer_token, logger):
 
     if action == "import":
         # check if there is already an image import job running
-        latest_job_status, _error = get_cos_image_import_status(
-            {
-                "name": workspace["name"],
-                "id": workspace["id"],
-                "crn": workspace["details"]["crn"],
-                "base_url": workspace["location"]["url"],
-            },
-            bearer_token,
-        )
+        latest_job_status, _error = get_cos_image_import_status(workspace_details, bearer_token)
 
         if image_found and is_active:
             logger.log_skipped(workspace, "Image with the same name exists in this workspace.")
@@ -201,6 +217,15 @@ def image_ops_on_workspace(action, workspace, bearer_token, logger):
         else:
             logger.log_skipped(workspace, "The image does not exist.")
 
+    elif action == "status":
+
+        response, _err = get_cos_image_import_status(workspace_details, bearer_token)
+        if response:
+            if response.json()["status"]["state"] != "completed":
+                pi_logger.error(f"Status: Not Completed for workspace : {workspace_details}")
+                logger.log_failure(workspace, _error)
+        else:
+            pi_logger.error(f"Error fetching status: {_err}")
     else:
         logger.log_failure(workspace, "Invalid operation specified.")
 
@@ -223,34 +248,6 @@ def process_image(boot_image_name, boot_images):
             return concerned_image[0], False
     else:
         return None, False
-
-
-def fetch_status(log_obj, sleep_duration):
-    enterprise_access_token = get_enterprise_bearer_token(os.getenv("IBMCLOUD_API_KEY"))
-
-    if log_obj and log_obj["success"]:
-        pi_logger.info(f"Initiating sleep for {sleep_duration} seconds before status check.")
-        time.sleep(sleep_duration)
-        pi_logger.info(f"Initiating status checks ...")
-        count = 0
-        while count < 7:
-            status_list = []
-            for account in log_obj["success"]:
-                for workspace in account["workspaces"]:
-                    response, _err = get_cos_image_import_status(workspace, enterprise_access_token)
-                    if response:
-                        if response.json()["status"]["state"] != "completed":
-                            status_list.append(workspace)
-            if not status_list:
-                pi_logger.info(f"INFO: Status check completed.")
-                pi_logger.info(f"INFO: Complete log file written to {CONFIG.get('log_operation_file_name')}")
-                break
-            count = +1
-            pi_logger.info(f"INFO: Initiating sleep for 5 mins. ({count}/6 times)")
-            time.sleep(300)
-    else:
-        pi_logger.info(f"INFO: No active requests found.")
-        pi_logger.info(f"INFO: Complete log file written to {CONFIG.get('log_operation_file_name')}")
 
 
 def write_logs_to_file(logger, file_name):
