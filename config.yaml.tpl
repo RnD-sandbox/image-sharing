@@ -19,7 +19,7 @@ account_list:
 # The import or delete operation to be performed for the custom PowerVS boot image. Accepted values are: IMPORT & DELETE.
 image_operation: "${image_operation}"
 
-# The name under which the boot image is visible in the PowerVS workspace, along with the license_type, product, and vendor details for SAP images. License type supported values: 'byol'; product supported values: 'Hana', 'Netweaver'; vendor allowable value: 'SAP'.
+# The name under which the boot image is visible in the PowerVS workspace, along with the license_type, product, and vendor details for SAP images. License type supported values: 'byol'; product supported values: 'Hana', 'Netweaver'; vendor allowable value: 'SAP'. When not using SAP images, license_type, product and vendor can be left empty
 image_details:
   image_name: "${image_name}"
   license_type: "${license_type}"
@@ -34,3 +34,7 @@ cos_bucket_details:
 
 # File names for logs
 log_operation_file_name: "${log_operation_file_name}"
+log_status_file_name: "${log_status_file_name}"
+
+# Int value for multiprocessing on child accounts in parallel
+processes: ${processes}

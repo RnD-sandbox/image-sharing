@@ -35,13 +35,13 @@ if __name__ == "__main__":
     elif CONFIG.get("account_list"):
         # Map all the account ids in account_list to their respective account name
         relevant_accounts = create_account_identity_map(enterprise_access_token, CONFIG.get("account_list"))
-        print(relevant_accounts)
         # Filter the trusted profiles to include account ID, profile ID, and account name
         filtered_trusted_profiles = filter_trusted_profiles(trusted_profiles, relevant_accounts)
 
     if filtered_trusted_profiles:
         image_operation = CONFIG.get("image_operation")
         log_operation_file_name = CONFIG.get("log_operation_file_name")
+        log_status_file_name = CONFIG.get("log_status_file_name")
         pi_logger.info(f"Initiating provided PowerVS boot image {image_operation} operation.")
 
         if image_operation == "IMPORT":
@@ -54,11 +54,11 @@ if __name__ == "__main__":
                 CONFIG.get("cos_bucket_details")["cos_image_file_name"],
             )
             # Import the image
-            image_ops_on_child_accounts("import", filtered_trusted_profiles, enterprise_access_token, log_operation_file_name)
+            image_ops_on_child_accounts("import", filtered_trusted_profiles, enterprise_access_token, log_operation_file_name, log_status_file_name)
 
         elif image_operation == "DELETE":
             # Delete the image
-            image_ops_on_child_accounts("delete", filtered_trusted_profiles, enterprise_access_token, log_operation_file_name)
+            image_ops_on_child_accounts("delete", filtered_trusted_profiles, enterprise_access_token, log_operation_file_name, log_status_file_name)
 
         else:
             pi_logger.error(f"Unidentified action '{image_operation}' passed. Supported operations are IMPORT and DELETE.")

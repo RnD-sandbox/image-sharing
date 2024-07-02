@@ -50,7 +50,19 @@ properties:
     required: ["cos_region", "cos_bucket", "cos_image_file_name"]
   log_operation_file_name:
     type: string
-required: ["enterprise_id", "image_operation", "image_details"]
+  log_status_file_name:
+    type: string
+  processes:
+    type: number
+required:
+  [
+    "enterprise_id",
+    "image_operation",
+    "image_details",
+    "log_status_file_name",
+    "log_operation_file_name",
+    "processes",
+  ]
 oneOf:
   - required: ["account_group_id"]
     properties:

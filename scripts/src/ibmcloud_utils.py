@@ -73,14 +73,14 @@ def filter_trusted_profiles(trusted_profiles, relevant_accounts_dict):
     ]
 
 
-def image_ops_on_child_accounts(action, account_list, enterprise_access_token, log_file):
+def image_ops_on_child_accounts(action, account_list, enterprise_access_token, ops_log_file, ops_status_log_file):
     """
     Deploys/Deletes images to /from child accounts using multiprocessing.
     Args:
         action: delete, import. Tells what operation to perform.
         account_list: List of account dictionaries containing account details.
         enterprise_access_token: Enterprise account access token.
-        log_file: Filename to store logs.
+        ops_log_file: Filename to store logs.
     """
     operation = {
         "delete": {"err_message": "ERROR: Delete image failed for following accounts", "sleep": 180},
@@ -89,35 +89,38 @@ def image_ops_on_child_accounts(action, account_list, enterprise_access_token, l
 
     if account_list:
         args = [(action, account, enterprise_access_token) for account in account_list]
-        with multiprocessing.Pool(processes=5) as pool:
+        with multiprocessing.Pool(processes=CONFIG.get("processes")) as pool:
             results = pool.starmap(image_ops_on_child_account, args)
 
-        final_log = merge_image_op_logs(results)
-        write_logs_to_file(final_log, log_file)
+        image_ops_log = merge_image_op_logs(results)
+        write_logs_to_file(image_ops_log, ops_log_file)
 
-        if final_log and final_log["success"]:
+        if image_ops_log and image_ops_log["success"]:
             pi_logger.info(f"Initiating sleep for {operation[action]['sleep']} seconds before status check.")
             time.sleep(operation[action]["sleep"])
             pi_logger.info(f"Initiating status checks ...")
             count = 0
             while count < 7:
-                with multiprocessing.Pool(processes=5) as pool:
+                with multiprocessing.Pool(processes=CONFIG.get("processes")) as pool:
                     status_results = pool.starmap(
                         image_ops_on_child_account, [("status", account, enterprise_access_token) for account in account_list]
                     )
-                    status_log = merge_image_op_logs(status_results)
-                if not status_log["failed"]:
+                    image_ops_status_log = merge_image_op_logs(status_results)
+                if not image_ops_status_log["failed"]:
                     pi_logger.info(f"INFO: Status Check Completed.")
                     pi_logger.info(f"INFO: Log file written to {CONFIG.get('log_operation_file_name')}.")
                     break
                 count += 1
-                pi_logger.info(f"INFO: Initiating sleep for 5 mins. Retrying {count} of 6 times")
+                pi_logger.info(f"INFO: Initiating sleep for 5 mins. Retrying {count} of 6 times....")
                 time.sleep(300)
-            if status_log is not None and status_log["failed"]:
-                pi_logger.error(f"{operation[action]['err_message']} '{status_log['failed']}'.")
+            if image_ops_status_log is not None and image_ops_status_log["failed"]:
+                pi_logger.error(f"{operation[action]['err_message']} '{image_ops_status_log['failed']}'.")
+            write_logs_to_file(image_ops_status_log, ops_status_log_file)
+        else:
+            pi_logger.info(f"No active request/changes done.")
 
-        if final_log is not None and final_log["failed"]:
-            pi_logger.error(f"{operation[action]['err_message']} '{final_log['failed']}'.")
+        if image_ops_log is not None and image_ops_log["failed"]:
+            pi_logger.error(f"{operation[action]['err_message']} '{image_ops_log['failed']}'.")
             sys.exit(1)
 
 
@@ -221,8 +224,11 @@ def image_ops_on_workspace(action, workspace, bearer_token, logger):
         response, _err = get_cos_image_import_status(workspace_details, bearer_token)
         if response:
             if response.json()["status"]["state"] != "completed":
-                pi_logger.error(f"Status: Not Completed for workspace : {workspace_details}")
+                pi_logger.error(f"Status: Image Operation not completed for workspace: {workspace_details}")
                 logger.log_failure(workspace, _error)
+            elif response.json()["status"]["state"] == "completed":
+                pi_logger.info(f"Status: Image Operation completed for workspace: {workspace_details}")
+                logger.log_success(workspace)
         else:
             pi_logger.error(f"Error fetching status: {_err}")
     else:
