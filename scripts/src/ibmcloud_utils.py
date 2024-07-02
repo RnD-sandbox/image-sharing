@@ -110,8 +110,8 @@ def image_ops_on_child_accounts(action, account_list, enterprise_access_token, l
                     pi_logger.info(f"INFO: Status Check Completed.")
                     pi_logger.info(f"INFO: Log file written to {CONFIG.get('log_operation_file_name')}.")
                     break
-                count = +1
-                pi_logger.info(f"INFO: Initiating sleep for 5 mins. {count} of 6 times")
+                count += 1
+                pi_logger.info(f"INFO: Initiating sleep for 5 mins. Retrying {count} of 6 times")
                 time.sleep(300)
             if status_log is not None and status_log["failed"]:
                 pi_logger.error(f"{operation[action]['err_message']} '{status_log['failed']}'.")
