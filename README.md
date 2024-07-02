@@ -35,6 +35,7 @@ No modules.
 | <a name="input_ibmcloud_api_key"></a> [ibmcloud\_api\_key](#input\_ibmcloud\_api\_key) | IBM Cloud enterprise API key created for Service ID. | `string` | n/a | yes |
 | <a name="input_image_details"></a> [image\_details](#input\_image\_details) | The name under which the boot image is visible in the PowerVS workspace. When 'image\_operation' is IMPORT Additional details like the license\_type, product, and vendor details for images are required. If not can be left empty. License type supported values: 'byol'; product supported values: 'Hana', 'Netweaver'; vendor allowable value: 'SAP'. | <pre>object({<br>    image_name   = string<br>    license_type = optional(string)<br>    product      = optional(string)<br>    vendor       = optional(string)<br>  })</pre> | <pre>{<br>  "image_name": "",<br>  "license_type": "",<br>  "product": "",<br>  "vendor": ""<br>}</pre> | no |
 | <a name="input_image_operation"></a> [image\_operation](#input\_image\_operation) | Select the import or delete operation to be performed for the custom PowerVS boot image. | `string` | n/a | yes |
+| <a name="input_processes"></a> [processes](#input\_processes) | Number of parallel processes to operate on accounts. | `number` | 10 | yes |
 
 ### Outputs
 

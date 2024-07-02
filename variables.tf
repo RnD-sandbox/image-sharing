@@ -69,4 +69,8 @@ variable "cos_data" {
   sensitive = true
 }
 
-
+variable "processes" {
+  description = "Number of parallel processes to operate on accounts"
+  type        = number
+  default     = 10
+}

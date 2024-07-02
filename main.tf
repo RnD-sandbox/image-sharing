@@ -1,5 +1,6 @@
 locals {
-  log_operation_file_name = "pi_image_manager_log.json"
+  log_operation_file_name = "pi_image_ops_log.json"
+  log_status_file_name    = "pi_image_status_log.json"
 
   is_cos_data_valid                = (var.image_operation == "IMPORT" && var.cos_data != null) || var.image_operation == "DELETE" ? true : false
   cos_data_validate_msg            = "The cos_data is null. The import operation of custom images requires cos_data."
@@ -25,6 +26,9 @@ resource "local_file" "config_yaml" {
     cos_bucket              = var.cos_data != null ? var.cos_data.cos_bucket_name : ""
     cos_image_file_name     = var.cos_image_file_name
     log_operation_file_name = local.log_operation_file_name
+    log_status_file_name    = local.log_status_file_name
+    processes               = var.processes
+
   })
 
   filename = "${path.module}/scripts/config.yaml"
@@ -49,6 +53,7 @@ resource "terraform_data" "trigger_vars" {
     cos_bucket              = var.cos_data != null ? var.cos_data.cos_bucket_name : ""
     cos_image_file_name     = var.cos_image_file_name
     log_operation_file_name = local.log_operation_file_name
+    log_status_file_name    = local.log_status_file_name
   }
 }
 
@@ -81,6 +86,7 @@ resource "terraform_data" "display_logs" {
     command = <<-EOT
       cat console.log
       cat ${local.log_operation_file_name}
+      cat ${local.log_status_file_name} 2>/dev/null || True
     EOT
 
   }
