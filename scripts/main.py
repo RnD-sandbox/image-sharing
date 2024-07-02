@@ -42,9 +42,8 @@ if __name__ == "__main__":
     if filtered_trusted_profiles:
         image_operation = CONFIG.get("image_operation")
         log_operation_file_name = CONFIG.get("log_operation_file_name")
-        log_image_status_file_name = CONFIG.get("log_image_status_file_name")
         pi_logger.info(f"Initiating provided PowerVS boot image {image_operation} operation.")
-        
+
         if image_operation == "IMPORT":
             # Check if cos credentials and image exists in bucket
             object_exists_in_ibm_cos(
@@ -55,14 +54,12 @@ if __name__ == "__main__":
                 CONFIG.get("cos_bucket_details")["cos_image_file_name"],
             )
             # Import the image
-            deploy_image_to_child_accounts(filtered_trusted_profiles, enterprise_access_token, log_operation_file_name)
+            image_ops_on_child_accounts("import", filtered_trusted_profiles, enterprise_access_token, log_operation_file_name)
 
         elif image_operation == "DELETE":
             # Delete the image
-            delete_image_from_child_accounts(filtered_trusted_profiles, enterprise_access_token, log_operation_file_name)
+            image_ops_on_child_accounts("delete", filtered_trusted_profiles, enterprise_access_token, log_operation_file_name)
 
-        elif image_operation == "STATUS":
-            get_image_import_status_from_accounts(filtered_trusted_profiles, enterprise_access_token, log_image_status_file_name)
         else:
             pi_logger.error(f"Unidentified action '{image_operation}' passed. Supported operations are IMPORT and DELETE.")
             sys.exit(1)

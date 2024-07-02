@@ -37,6 +37,7 @@ class ImageShareLogger:
                 "id": workspace["id"],
                 "crn": workspace["details"]["crn"],
                 "base_url": workspace["location"]["url"],
+                "error": error,
             }
         )
 
