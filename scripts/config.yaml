@@ -1,5 +1,5 @@
 # The enterprise account id
-enterprise_id: "xxxxxxxxxxxxxxxxxxxxxx"
+enterprise_id: ""
 
 # IMPORTANT
 # You can target the accounts with either account_group_id or account_list
@@ -8,7 +8,7 @@ enterprise_id: "xxxxxxxxxxxxxxxxxxxxxx"
 # Do not provide both account_group_id & account_list
 
 # ID of the parent account group.
-account_group_id: "xxxxxxxxxxxxxxxxxxxxxx"
+account_group_id: ""
 
 # List of account IDs to target.
 account_list:
@@ -26,7 +26,7 @@ image_details:
 # Cloud Object Storage bucket name, region and file name. Required only when the image operation is IMPORT.
 cos_bucket_details:
   cos_region: "eu-de"
-  cos_bucket: "xxxxxxxxxxxxxxxxxxxxxx"
+  cos_bucket: ""
   cos_image_file_name: "rh-9-2-sap-2703.ova.gz"
 
 # File names for logs
