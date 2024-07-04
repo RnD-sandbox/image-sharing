@@ -105,7 +105,7 @@ def image_ops_on_child_accounts(action, account_list, enterprise_access_token, o
             args = [(operation[action]["status"], account, enterprise_access_token) for account in account_list]
 
             # Check status every 5 mins with 6 retires
-            while count < 7:
+            while count < 6:
                 with multiprocessing.Pool(processes=CONFIG.get("processes")) as pool:
                     status_results = pool.starmap(image_ops_on_child_account, args)
                 image_ops_status_log = merge_image_op_logs(status_results)

@@ -16,14 +16,14 @@ account_list:
 # The import or delete operation to be performed for the custom PowerVS boot image. Accepted values are: IMPORT & DELETE.
 image_operation: "IMPORT"
 
-# The name under which the boot image is visible in the PowerVS workspace, along with the license_type, product, and vendor details for SAP images. License type supported values: 'byol'; product supported values: 'Hana', 'Netweaver'; vendor allowable value: 'SAP'. When not using SAP images, license_type, product and vendor can be left empty
+# The name under which the boot image is visible in the PowerVS workspace, along with the license_type, product, and vendor details for SAP images. License type supported values: 'byol'; product supported values: 'Hana', 'Netweaver'; vendor allowable value: 'SAP'. When not using SAP images, license_type, product and vendor can be left empty. Image_name should not be empty.
 image_details:
   image_name: "test-image"
   license_type: "byol"
   product: "Hana"
   vendor: "SAP"
 
-# Cloud Object Storage bucket name, region and file name.
+# Cloud Object Storage bucket name, region and file name. Required only when the image operation is IMPORT.
 cos_bucket_details:
   cos_region: "eu-de"
   cos_bucket: "xxxxxxxxxxxxxxxxxxxxxx"
